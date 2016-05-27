@@ -34,11 +34,11 @@ namespace CheckmarxReports
         /// <exception cref="ArgumentNullException">
         /// No argument can be null, empty or whitespace.
         /// </exception>
-        /// <exception cref="CommunicationException">
-        /// An error occurred communicating with the Checkmarx server.
-        /// </exception>
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
+        /// </exception>
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
         /// </exception>
         public CheckmarxApiSession(string server, string userName, string password)
         {
@@ -89,9 +89,26 @@ namespace CheckmarxReports
         {
             if (!_disposed)
             {
-                Logout();
+                try
+                {
+                    Logout();
+                }
+                catch
+                {
+                    // Ignore any errors. We tried. :-)
+                }
+
                 SessionId = null;
-                SoapClient.Close();
+
+                try
+                {
+                    SoapClient.Close();
+                }
+                catch
+                {
+                    // Ignore any errors. We tried. :-)
+                }
+
                 _disposed = true;
             }
         }
@@ -121,7 +138,9 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
-
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
         public long CreateScanReport(long scanId, CxWSReportType reportType)
         {
             CxWSReportRequest reportRequest;
@@ -132,13 +151,7 @@ namespace CheckmarxReports
                 Type = reportType
             };
 
-            CxWSCreateReportResponse response = SoapClient.CreateScanReport(SessionId, reportRequest);
-            if (!response.IsSuccesfull)
-            {
-                throw new CheckmarxErrorException(response.ErrorMessage);
-            }
-
-            return response.ID;
+            return CallCheckmarxApi(() => SoapClient.CreateScanReport(SessionId, reportRequest)).ID;
         }
 
         /// <summary>
@@ -150,16 +163,12 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
-
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
         public ProjectDisplayData[] GetProjects()
         {
-            CxWSResponseProjectsDisplayData response = SoapClient.GetProjectsDisplayData(SessionId);
-            if (!response.IsSuccesfull)
-            {
-                throw new CheckmarxErrorException(response.ErrorMessage);
-            }
-
-            return response.projectList;
+            return CallCheckmarxApi(() => SoapClient.GetProjectsDisplayData(SessionId)).projectList;
         }
 
         /// <summary>
@@ -174,16 +183,13 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
 
         public ProjectScannedDisplayData[] GetProjectScans()
         {
-            CxWSResponseProjectScannedDisplayData response = SoapClient.GetProjectScannedDisplayData(SessionId);
-            if (!response.IsSuccesfull)
-            {
-                throw new CheckmarxErrorException(response.ErrorMessage);
-            }
-
-            return response.ProjectScannedList;
+            return CallCheckmarxApi(() => SoapClient.GetProjectScannedDisplayData(SessionId)).ProjectScannedList;
         }
 
         /// <summary>
@@ -195,16 +201,12 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
-
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
         public byte[] GetScanReport(long reportId)
         {
-            CxWSResponseScanResults response = SoapClient.GetScanReport(SessionId, reportId);
-            if (!response.IsSuccesfull)
-            {
-                throw new CheckmarxErrorException(response.ErrorMessage);
-            }
-
-            return response.ScanResults;
+            return CallCheckmarxApi(() => SoapClient.GetScanReport(SessionId, reportId)).ScanResults;
         }
 
         /// <summary>
@@ -216,15 +218,12 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
         public CxWSReportStatusResponse GetScanReportStatus(long reportId)
         {
-            CxWSReportStatusResponse response = SoapClient.GetScanReportStatus(SessionId, reportId);
-            if (!response.IsSuccesfull)
-            {
-                throw new CheckmarxErrorException(response.ErrorMessage);
-            }
-
-            return response;
+            return CallCheckmarxApi(() => SoapClient.GetScanReportStatus(SessionId, reportId));
         }
 
         /// <summary>
@@ -236,11 +235,11 @@ namespace CheckmarxReports
         /// <exception cref="ArgumentNullException">
         /// <paramref name="server"/> cannot be null, empty or whitespace.
         /// </exception>
-        /// <exception cref="CommunicationException">
-        /// An error occurred communicating with the Checkmarx server.
-        /// </exception>
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
+        /// </exception>
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
         /// </exception>
         private Uri GetSdkUrl(string server)
         {
@@ -251,22 +250,29 @@ namespace CheckmarxReports
 
             BasicHttpBinding binding;
             EndpointAddress endpointAddress;
+            CxWSResponseDiscovery response;
 
             binding = new BasicHttpBinding(BasicHttpSecurityMode.Transport);
             endpointAddress = new EndpointAddress(string.Format($"https://{Uri.EscapeUriString(server)}/Cxwebinterface/CxWsResolver.asmx"));
 
-            using (CxWSResolverSoapClient client = new CxWSResolverSoapClient(binding, endpointAddress))
+            try
             {
-                CxWSResponseDiscovery response = client.GetWebServiceUrl(CxWsResolver.CxClientType.SDK, CheckmarxApiVersion);
-                if (!response.IsSuccesfull)
+                using (CxWSResolverSoapClient client = new CxWSResolverSoapClient(binding, endpointAddress))
                 {
-                    throw new CheckmarxErrorException(response.ErrorMessage);
-                }
+                    response = client.GetWebServiceUrl(CxWsResolver.CxClientType.SDK, CheckmarxApiVersion);
+                    if (!response.IsSuccesfull)
+                    {
+                        throw new CheckmarxErrorException(response.ErrorMessage);
+                    }
 
-                return new Uri(response.ServiceURL, UriKind.Absolute);
+                    return new Uri(response.ServiceURL, UriKind.Absolute);
+                }
+            }
+            catch (CommunicationException ex)
+            {
+                throw new CheckmarxCommunicationException(ex.Message, ex);
             }
         }
-
 
         /// <summary>
         /// 
@@ -324,13 +330,7 @@ namespace CheckmarxReports
                 Pass = password
             };
 
-            CxWSResponseLoginData loginData = SoapClient.Login(credentials, CheckmarxLocaleId);
-            if (!loginData.IsSuccesfull)
-            {
-                throw new CheckmarxErrorException(loginData.ErrorMessage);
-            }
-
-            return loginData.SessionId;
+            return CallCheckmarxApi(() => SoapClient.Login(credentials, CheckmarxLocaleId)).SessionId;
         }
 
         /// <summary>
@@ -348,12 +348,56 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
         private void Logout()
         {
-            CxSDKWebService.CxWSBasicRepsonse basicRepsonse = SoapClient.Logout(SessionId);
-            if (!basicRepsonse.IsSuccesfull)
+            CallCheckmarxApi(() => SoapClient.Logout(SessionId));
+        }
+
+        /// <summary>
+        /// Wrap Checkmarx API calls to handle errors and convert exceptions.
+        /// </summary>
+        /// <typeparam name="TResult">
+        /// The return type of the call. Must inherit from <see cref="xSDKWebService.CxWSBasicRepsonse"/>.
+        /// </typeparam>
+        /// <param name="apiCall">
+        /// A <see cref="Func{TResult}"/> that actually does the API call. This cannot be null.
+        /// </param>
+        /// <returns>
+        /// The call response.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// No argument can be null. <paramref name="sessionId"/> cannot be empty or whitespace.
+        /// </exception>
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
+        /// <exception cref="CheckmarxCommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
+        private TResult CallCheckmarxApi<TResult>(Func<TResult> apiCall)
+            where TResult: CxSDKWebService.CxWSBasicRepsonse
+        {
+            if (apiCall == null)
             {
-                throw new CheckmarxErrorException(basicRepsonse.ErrorMessage);
+                throw new ArgumentNullException(nameof(apiCall));
+            }
+
+            try
+            {
+                TResult t = apiCall();
+                if (!t.IsSuccesfull)
+                {
+                    throw new CheckmarxErrorException(t.ErrorMessage);
+                }
+
+                return t;
+            }
+            catch (CommunicationException ex)
+            {
+                throw new CheckmarxCommunicationException(ex.Message, ex);
             }
         }
     }
