@@ -45,8 +45,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckmarxApi.cs" />
+    <Compile Include="CheckmarxCommunicationException.cs" />
+    <Compile Include="CheckmarxErrorException.cs" />
+    <Compile Include="CheckmarxException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportFactory.cs" />
+    <Compile Include="Service References\CxSDKWebService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Service References\CxWsResolver\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -55,6 +65,148 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CancelScanResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CreateScanReportResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSBasicRepsonse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSCreateReportResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSReportStatusResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseConfigSetList.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseGroupList.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseLoginData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponsePresetList.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseProjectConfig.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseProjectScannedDisplayData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseProjectsDisplayData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseRunID.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseScanResults.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseScansDisplayData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseScanStatus.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseScanSummary.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseTeamLdapGroupMappingData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.CxWSResponseUserData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.DeleteProjectsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.DeleteScansResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.DeleteUserResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.ExecuteDataRetentionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetAllUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetAssociatedGroupsListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetConfigurationSetListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetPresetListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetProjectConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetProjectScannedDisplayDataResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetProjectsDisplayDataResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetScanReportResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetScanReportStatusResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetScansDisplayDataForAllProjectsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetScanSummaryResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetStatusOfSingleScanResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.GetTeamLdapGroupsMappingResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.LoginResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.LogoutResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.ScanResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.ScanWithOriginNameResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.ScanWithSchedulingResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.ScanWithSchedulingWithCronResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.SetTeamLdapGroupsMappingResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.StopDataRetentionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.UpdateProjectConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.UpdateProjectIncrementalConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CheckmarxReports.CxSDKWebService.UpdateScanCommentResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CxSDKWebService\CxSDKWebService.wsdl" />
     <None Include="Service References\CxWsResolver\CheckmarxReports.CxWsResolver.CxWSResponseDiscovery.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -67,6 +219,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadataStorage Include="Service References\CxSDKWebService\" />
     <WCFMetadataStorage Include="Service References\CxWsResolver\" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +233,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\CxWsResolver\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\CxSDKWebService\CxSDKWebService.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\CxSDKWebService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\CxSDKWebService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\CxSDKWebService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
