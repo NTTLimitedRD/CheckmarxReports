@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckmarxApi.cs" />
+    <Compile Include="CheckmarxApiSession.cs" />
     <Compile Include="CheckmarxCommunicationException.cs" />
     <Compile Include="CheckmarxErrorException.cs" />
     <Compile Include="CheckmarxException.cs" />

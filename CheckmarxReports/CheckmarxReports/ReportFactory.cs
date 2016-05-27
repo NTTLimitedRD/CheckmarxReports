@@ -73,53 +73,37 @@ namespace CheckmarxReports
 
         public void Run()
         {
-            Uri sdkUrl;
-            string sessionId = null;
             ProjectScannedDisplayData[] projects;
 
             try
             {
-                sdkUrl = CheckmarxApi.GetSdkUrl(HostName);
-                using (CxSDKWebServiceSoapClient client = CheckmarxApi.GetSoapClient(sdkUrl))
+                using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(HostName, UserName, Password))
                 {
-                    try
+                    projects = checkmarxApiSession.GetProjectScans();
+                    ProjectScannedDisplayData project = projects.First();
+                    // foreach (ProjectScannedDisplayData project in projects)
                     {
-                        sessionId = CheckmarxApi.Login(client, UserName, Password);
-                        projects = CheckmarxApi.GetProjectScans(client, sessionId);
-                        ProjectScannedDisplayData project = projects.First();
-                        // foreach (ProjectScannedDisplayData project in projects)
+                        // TODO: Include in output
+                        // project.ProjectName;
+
+                        // Generate an XML scan report
+                        long reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
+
+                        // Extract whether there are any issues that are "New" or "Unconfirmed"
+                        for (;;)
                         {
-                            // TODO: Include in output
-                            // project.ProjectName;
-
-                            // Generate an XML scan report
-                            long reportId = CheckmarxApi.CreateScanReport(client, sessionId, project.LastScanID, CxWSReportType.XML);
-
-                            // Extract whether there are any issues that are "New" or "Unconfirmed"
-                            for (;;)
+                            CxWSReportStatusResponse reportStatusResponse = checkmarxApiSession.GetScanReportStatus(reportId);
+                            if (reportStatusResponse.IsFailed)
                             {
-                                CxWSReportStatusResponse reportStatusResponse = CheckmarxApi.GetScanReportStatus(
-                                    client, sessionId, reportId);
-                                if (reportStatusResponse.IsFailed)
-                                {
-                                    throw new CheckmarxErrorException("Generating report ID {reportID} on scan {project.LastScanId} on project {project.ProjectName} failed");
-                                }
-                                else if (reportStatusResponse.IsReady)
-                                {
-                                    break;
-                                }
+                                throw new CheckmarxErrorException("Generating report ID {reportID} on scan {project.LastScanId} on project {project.ProjectName} failed");
                             }
-
-                            byte[] report = CheckmarxApi.GetScanReport(client, sessionId, reportId);
-
+                            else if (reportStatusResponse.IsReady)
+                            {
+                                break;
+                            }
                         }
-                    }
-                    finally
-                    {
-                        if (sessionId != null)
-                        {
-                            CheckmarxApi.Logout(client, sessionId);
-                        }
+
+                        byte[] report = checkmarxApiSession.GetScanReport(reportId);
                     }
                 }
             }

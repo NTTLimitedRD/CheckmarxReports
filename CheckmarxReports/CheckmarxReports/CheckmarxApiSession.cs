@@ -13,20 +13,102 @@ namespace CheckmarxReports
     /// <summary>
     /// Wrappers for the individual Checkmarx web methods.
     /// </summary>
-    public static class CheckmarxApi
+    public class CheckmarxApiSession: IDisposable
     {
         private const int CheckmarxApiVersion = 1;
         private const int CheckmarxLocaleId = 1033; // US English
+        private bool _disposed = false;
+
+        /// <summary>
+        /// Create a new <see cref="CheckmarxApiSession"/>.
+        /// </summary>
+        /// <param name="server">
+        /// The name of the Checkmarx server. This cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="username">
+        /// The user name to login with. This cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="password">
+        /// The password to login with. This cannot be null, empty or whitespace.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// No argument can be null, empty or whitespace.
+        /// </exception>
+        /// <exception cref="CommunicationException">
+        /// An error occurred communicating with the Checkmarx server.
+        /// </exception>
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
+        public CheckmarxApiSession(string server, string userName, string password)
+        {
+            if (string.IsNullOrWhiteSpace(server))
+            {
+                throw new ArgumentNullException(nameof(server));
+            }
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
+            Uri sdkUrl;
+
+            sdkUrl = GetSdkUrl(server);
+            SoapClient = GetSoapClient(sdkUrl);
+            SessionId = Login(userName, password);
+        }
+
+        /// <summary>
+        /// Finalizer.
+        /// </summary>
+        ~CheckmarxApiSession()
+        {
+            Disposing(false);
+        }
+
+        /// <summary>
+        /// IDisposable implementation.
+        /// </summary>
+        public void Dispose()
+        {
+            Disposing(true);    
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposing pattern.
+        /// </summary>
+        /// <param name="disposing">
+        /// True if called from <see cref="Dispose"/>, false if called from the finalizer.
+        /// </param>
+        protected virtual void Disposing(bool disposing)
+        {
+            if (!_disposed)
+            {
+                Logout();
+                SessionId = null;
+                SoapClient.Close();
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="CxSDKWebServiceSoapClient"/> used to call Checkmarx APIs.
+        /// </summary>
+        private CxSDKWebServiceSoapClient SoapClient { get; }
+
+        /// <summary>
+        /// The ID of the current session returned from <see cref="Login"/>.
+        /// </summary>
+        private string SessionId { get; set; }
 
         /// <summary>
         /// Start creating a scan report.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
-        /// </param>
         /// <param name="scanId">
         /// The scan ID to generate a report for.
         /// </param>
@@ -36,17 +118,12 @@ namespace CheckmarxReports
         /// <returns>
         /// The report ID.
         /// </returns>
-        public static long CreateScanReport(CxSDKWebServiceSoapClient client, string sessionId, long scanId, CxWSReportType reportType)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                throw new ArgumentNullException(nameof(sessionId));
-            }
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
 
+        public long CreateScanReport(long scanId, CxWSReportType reportType)
+        {
             CxWSReportRequest reportRequest;
 
             reportRequest = new CxWSReportRequest()
@@ -55,7 +132,7 @@ namespace CheckmarxReports
                 Type = reportType
             };
 
-            CxWSCreateReportResponse response = client.CreateScanReport(sessionId, reportRequest);
+            CxWSCreateReportResponse response = SoapClient.CreateScanReport(SessionId, reportRequest);
             if (!response.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(response.ErrorMessage);
@@ -67,24 +144,16 @@ namespace CheckmarxReports
         /// <summary>
         /// Get the projects.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
-        /// </param>
-        public static ProjectDisplayData[] GetProjects(CxSDKWebServiceSoapClient client, string sessionId)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                throw new ArgumentNullException(nameof(sessionId));
-            }
+        /// <returns>
+        /// The <see cref="ProjectDisplayData"/> containing project information.
+        /// </returns>
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
 
-            CxWSResponseProjectsDisplayData response = client.GetProjectsDisplayData(sessionId);
+        public ProjectDisplayData[] GetProjects()
+        {
+            CxWSResponseProjectsDisplayData response = SoapClient.GetProjectsDisplayData(SessionId);
             if (!response.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(response.ErrorMessage);
@@ -102,18 +171,13 @@ namespace CheckmarxReports
         /// <param name="sessionId">
         /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
         /// </param>
-        public static ProjectScannedDisplayData[] GetProjectScans(CxSDKWebServiceSoapClient client, string sessionId)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                throw new ArgumentNullException(nameof(sessionId));
-            }
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
 
-            CxWSResponseProjectScannedDisplayData response = client.GetProjectScannedDisplayData(sessionId);
+        public ProjectScannedDisplayData[] GetProjectScans()
+        {
+            CxWSResponseProjectScannedDisplayData response = SoapClient.GetProjectScannedDisplayData(SessionId);
             if (!response.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(response.ErrorMessage);
@@ -125,27 +189,16 @@ namespace CheckmarxReports
         /// <summary>
         /// Get the report contents.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
-        /// </param>
         /// <param name="reportId">
         /// The report ID returned from <see cref="CreateScanReport"/>.
         /// </param>
-        public static byte[] GetScanReport(CxSDKWebServiceSoapClient client, string sessionId, long reportId)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                throw new ArgumentNullException(nameof(sessionId));
-            }
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
 
-            CxWSResponseScanResults response = client.GetScanReport(sessionId, reportId);
+        public byte[] GetScanReport(long reportId)
+        {
+            CxWSResponseScanResults response = SoapClient.GetScanReport(SessionId, reportId);
             if (!response.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(response.ErrorMessage);
@@ -157,27 +210,15 @@ namespace CheckmarxReports
         /// <summary>
         /// See if a report has been generated yet or has failed.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
-        /// </param>
         /// <param name="reportId">
         /// The report ID returned from <see cref="CreateScanReport"/>.
         /// </param>
-        public static CxWSReportStatusResponse GetScanReportStatus(CxSDKWebServiceSoapClient client, string sessionId, long reportId)
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
+        public CxWSReportStatusResponse GetScanReportStatus(long reportId)
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                throw new ArgumentNullException(nameof(sessionId));
-            }
-
-            CxWSReportStatusResponse response = client.GetScanReportStatus(sessionId, reportId);
+            CxWSReportStatusResponse response = SoapClient.GetScanReportStatus(SessionId, reportId);
             if (!response.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(response.ErrorMessage);
@@ -189,8 +230,11 @@ namespace CheckmarxReports
         /// <summary>
         /// Get the Checkmarx SDK URL.
         /// </summary>
+        /// <param name="server">
+        /// The name of the Checkmarx server. This cannot be null, empty or whitespace.
+        /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="hostName"/> cannot be null, empty or whitespace.
+        /// <paramref name="server"/> cannot be null, empty or whitespace.
         /// </exception>
         /// <exception cref="CommunicationException">
         /// An error occurred communicating with the Checkmarx server.
@@ -198,18 +242,18 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
-        public static Uri GetSdkUrl(string hostName)
+        private Uri GetSdkUrl(string server)
         {
-            if (string.IsNullOrWhiteSpace(hostName))
+            if (string.IsNullOrWhiteSpace(server))
             {
-                throw new ArgumentNullException(nameof(hostName));
+                throw new ArgumentNullException(nameof(server));
             }
 
             BasicHttpBinding binding;
             EndpointAddress endpointAddress;
 
             binding = new BasicHttpBinding(BasicHttpSecurityMode.Transport);
-            endpointAddress = new EndpointAddress(string.Format($"https://{Uri.EscapeUriString(hostName)}/Cxwebinterface/CxWsResolver.asmx"));
+            endpointAddress = new EndpointAddress(string.Format($"https://{Uri.EscapeUriString(server)}/Cxwebinterface/CxWsResolver.asmx"));
 
             using (CxWSResolverSoapClient client = new CxWSResolverSoapClient(binding, endpointAddress))
             {
@@ -229,7 +273,7 @@ namespace CheckmarxReports
         /// </summary>
         /// <param name="sdkUrl"></param>
         /// <returns></returns>
-        public static CxSDKWebServiceSoapClient GetSoapClient(Uri sdkUrl)
+        private CxSDKWebServiceSoapClient GetSoapClient(Uri sdkUrl)
         {
             BasicHttpBinding binding;
             EndpointAddress endpointAddress;
@@ -243,9 +287,6 @@ namespace CheckmarxReports
         /// <summary>
         /// Login the given user.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
         /// <param name="username">
         /// The user name to login with. This cannot be null, empty or whitespace.
         /// </param>
@@ -264,12 +305,8 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
-        public static string Login(CxSDKWebServiceSoapClient client, string username, string password)
+        private string Login(string username, string password)
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
             if (string.IsNullOrWhiteSpace(username))
             {
                 throw new ArgumentNullException(nameof(username));
@@ -287,7 +324,7 @@ namespace CheckmarxReports
                 Pass = password
             };
 
-            CxWSResponseLoginData loginData = client.Login(credentials, CheckmarxLocaleId);
+            CxWSResponseLoginData loginData = SoapClient.Login(credentials, CheckmarxLocaleId);
             if (!loginData.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(loginData.ErrorMessage);
@@ -308,18 +345,12 @@ namespace CheckmarxReports
         /// <exception cref="ArgumentNullException">
         /// No argument can be null. <paramref name="sessionId"/> cannot be empty or whitespace.
         /// </exception>
-        public static void Logout(CxSDKWebServiceSoapClient client, string sessionId)
+        /// <exception cref="CheckmarxErrorException">
+        /// The Checkmarx API returned an unexpected error.
+        /// </exception>
+        private void Logout()
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                throw new ArgumentNullException(nameof(sessionId));
-            }
-
-            CxSDKWebService.CxWSBasicRepsonse basicRepsonse = client.Logout(sessionId);
+            CxSDKWebService.CxWSBasicRepsonse basicRepsonse = SoapClient.Logout(SessionId);
             if (!basicRepsonse.IsSuccesfull)
             {
                 throw new CheckmarxErrorException(basicRepsonse.ErrorMessage);
