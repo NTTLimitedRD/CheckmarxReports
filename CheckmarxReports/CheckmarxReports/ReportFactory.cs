@@ -77,55 +77,48 @@ namespace CheckmarxReports
         {
             ProjectScannedDisplayData[] projects;
 
-            try
+            using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(HostName, UserName, Password))
             {
-                using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(HostName, UserName, Password))
+                projects = checkmarxApiSession.GetProjectScans();
+                // ProjectScannedDisplayData project = projects.First();
+                foreach (ProjectScannedDisplayData project in projects)
                 {
-                    projects = checkmarxApiSession.GetProjectScans();
-                    // ProjectScannedDisplayData project = projects.First();
-                    foreach (ProjectScannedDisplayData project in projects)
+                    // TODO: Include in output
+                    // project.ProjectName;
+
+                    // Generate an XML scan report
+                    long reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
+
+                    // Extract whether there are any issues that are "New" or "Unconfirmed"
+                    // TODO: Consider a timeout
+                    for (;;)
                     {
-                        // TODO: Include in output
-                        // project.ProjectName;
-
-                        // Generate an XML scan report
-                        long reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
-
-                        // Extract whether there are any issues that are "New" or "Unconfirmed"
-                        // TODO: Consider a timeout
-                        for (;;)
+                        CxWSReportStatusResponse reportStatusResponse = checkmarxApiSession.GetScanReportStatus(reportId);
+                        if (reportStatusResponse.IsFailed)
                         {
-                            CxWSReportStatusResponse reportStatusResponse = checkmarxApiSession.GetScanReportStatus(reportId);
-                            if (reportStatusResponse.IsFailed)
-                            {
-                                throw new CheckmarxErrorException("Generating report ID {reportID} on scan {project.LastScanId} on project {project.ProjectName} failed");
-                            }
-                            else if (reportStatusResponse.IsReady)
-                            {
-                                break;
-                            }
-
-                            // TODO: Consider a better mechanism
-                            System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
+                            throw new CheckmarxErrorException("Generating report ID {reportID} on scan {project.LastScanId} on project {project.ProjectName} failed");
+                        }
+                        else if (reportStatusResponse.IsReady)
+                        {
+                            break;
                         }
 
-                        byte[] report = checkmarxApiSession.GetScanReport(reportId);
-                        //XmlDocument xmlDocument = new XmlDocument();
-                        //using (MemoryStream memoryStream = new MemoryStream(report))
-                        //{
-                        //    xmlDocument.Load(memoryStream);
-                        //}
-
-                        // TODO: Look at //Result/@FalsePositive="False" nodes, specifically the @DeepLink attribte
-
-                        output.WriteLine(Encoding.UTF8.GetString(report));
-                        output.Flush();
+                        // TODO: Consider a better mechanism
+                        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
                     }
+
+                    byte[] report = checkmarxApiSession.GetScanReport(reportId);
+                    //XmlDocument xmlDocument = new XmlDocument();
+                    //using (MemoryStream memoryStream = new MemoryStream(report))
+                    //{
+                    //    xmlDocument.Load(memoryStream);
+                    //}
+
+                    // TODO: Look at //Result/@FalsePositive="False" nodes, specifically the @DeepLink attribte
+
+                    output.WriteLine(Encoding.UTF8.GetString(report));
+                    output.Flush();
                 }
-            }
-            catch (CommunicationException ex)
-            {
-                throw new CheckmarxCommunicationException(ex.Message, ex);
             }
         }
     }
