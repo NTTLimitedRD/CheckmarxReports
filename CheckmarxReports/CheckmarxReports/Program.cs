@@ -35,7 +35,7 @@ namespace CheckmarxReports
                     try
                     {
                         ReportFactory reportFactory;
-                        
+
                         reportFactory = new ReportFactory(options.HostName, options.UserName, options.Password);
                         reportFactory.Run();
 
