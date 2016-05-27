@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using CheckmarxReports.CxSDKWebService;
 using CheckmarxReports.CxWsResolver;
 using CxClientType = CheckmarxReports.CxWsResolver.CxClientType;
@@ -71,7 +73,7 @@ namespace CheckmarxReports
             get; set;
         }
 
-        public void Run()
+        public void Run(TextWriter output)
         {
             ProjectScannedDisplayData[] projects;
 
@@ -80,8 +82,8 @@ namespace CheckmarxReports
                 using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(HostName, UserName, Password))
                 {
                     projects = checkmarxApiSession.GetProjectScans();
-                    ProjectScannedDisplayData project = projects.First();
-                    // foreach (ProjectScannedDisplayData project in projects)
+                    // ProjectScannedDisplayData project = projects.First();
+                    foreach (ProjectScannedDisplayData project in projects)
                     {
                         // TODO: Include in output
                         // project.ProjectName;
@@ -90,6 +92,7 @@ namespace CheckmarxReports
                         long reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
 
                         // Extract whether there are any issues that are "New" or "Unconfirmed"
+                        // TODO: Consider a timeout
                         for (;;)
                         {
                             CxWSReportStatusResponse reportStatusResponse = checkmarxApiSession.GetScanReportStatus(reportId);
@@ -101,9 +104,22 @@ namespace CheckmarxReports
                             {
                                 break;
                             }
+
+                            // TODO: Consider a better mechanism
+                            System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
                         }
 
                         byte[] report = checkmarxApiSession.GetScanReport(reportId);
+                        //XmlDocument xmlDocument = new XmlDocument();
+                        //using (MemoryStream memoryStream = new MemoryStream(report))
+                        //{
+                        //    xmlDocument.Load(memoryStream);
+                        //}
+
+                        // TODO: Look at //Result/@FalsePositive="False" nodes, specifically the @DeepLink attribte
+
+                        output.WriteLine(Encoding.UTF8.GetString(report));
+                        output.Flush();
                     }
                 }
             }

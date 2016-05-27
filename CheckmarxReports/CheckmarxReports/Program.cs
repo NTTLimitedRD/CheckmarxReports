@@ -36,7 +36,7 @@ namespace CheckmarxReports
                     try
                     {
                         using (Stream stream = string.IsNullOrWhiteSpace(options.OutputPath)
-                            ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Truncate))
+                            ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Create))
                         using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
                         {
                             RunReport(options.HostName, options.UserName, options.Password, output);
@@ -85,7 +85,7 @@ namespace CheckmarxReports
             ReportFactory reportFactory;
 
             reportFactory = new ReportFactory(hostName, userName, password);
-            reportFactory.Run();
+            reportFactory.Run(output);
         }
     }
 }
