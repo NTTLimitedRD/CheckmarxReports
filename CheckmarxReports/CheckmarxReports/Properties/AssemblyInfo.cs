@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CheckmarxReports")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Checkmarx Reports")]
+[assembly: AssemblyDescription("Simple report generation for Checkmarx")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CheckmarxReports")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Dimension Data")]
+[assembly: AssemblyProduct("Checkmarx Reports")]
+[assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
