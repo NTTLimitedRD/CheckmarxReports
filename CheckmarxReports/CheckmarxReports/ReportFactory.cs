@@ -75,7 +75,7 @@ namespace CheckmarxReports
         {
             Uri sdkUrl;
             string sessionId = null;
-            ProjectDisplayData[] projects;
+            ProjectScannedDisplayData[] projects;
 
             try
             {
@@ -85,10 +85,33 @@ namespace CheckmarxReports
                     try
                     {
                         sessionId = CheckmarxApi.Login(client, UserName, Password);
-                        projects = CheckmarxApi.GetProjects(client, sessionId);
-                        foreach (ProjectDisplayData project in projects)
+                        projects = CheckmarxApi.GetProjectScans(client, sessionId);
+                        ProjectScannedDisplayData project = projects.First();
+                        // foreach (ProjectScannedDisplayData project in projects)
                         {
-                            // project
+                            // TODO: Include in output
+                            // project.ProjectName;
+
+                            // Generate an XML scan report
+                            long reportId = CheckmarxApi.CreateScanReport(client, sessionId, project.LastScanID, CxWSReportType.XML);
+
+                            // Extract whether there are any issues that are "New" or "Unconfirmed"
+                            for (;;)
+                            {
+                                CxWSReportStatusResponse reportStatusResponse = CheckmarxApi.GetScanReportStatus(
+                                    client, sessionId, reportId);
+                                if (reportStatusResponse.IsFailed)
+                                {
+                                    throw new CheckmarxErrorException("Generating report ID {reportID} on scan {project.LastScanId} on project {project.ProjectName} failed");
+                                }
+                                else if (reportStatusResponse.IsReady)
+                                {
+                                    break;
+                                }
+                            }
+
+                            byte[] report = CheckmarxApi.GetScanReport(client, sessionId, reportId);
+
                         }
                     }
                     finally

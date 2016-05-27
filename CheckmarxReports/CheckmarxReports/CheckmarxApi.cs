@@ -19,13 +19,59 @@ namespace CheckmarxReports
         private const int CheckmarxLocaleId = 1033; // US English
 
         /// <summary>
+        /// Start creating a scan report.
+        /// </summary>
+        /// <param name="client">
+        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
+        /// </param>
+        /// <param name="sessionId">
+        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="scanId">
+        /// The scan ID to generate a report for.
+        /// </param>
+        /// <param name="reportType">
+        /// The report type.
+        /// </param>
+        /// <returns>
+        /// The report ID.
+        /// </returns>
+        public static long CreateScanReport(CxSDKWebServiceSoapClient client, string sessionId, long scanId, CxWSReportType reportType)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                throw new ArgumentNullException(nameof(sessionId));
+            }
+
+            CxWSReportRequest reportRequest;
+
+            reportRequest = new CxWSReportRequest()
+            {
+                ScanID = scanId,
+                Type = reportType
+            };
+
+            CxWSCreateReportResponse response = client.CreateScanReport(sessionId, reportRequest);
+            if (!response.IsSuccesfull)
+            {
+                throw new CheckmarxErrorException(response.ErrorMessage);
+            }
+
+            return response.ID;
+        }
+
+        /// <summary>
         /// Get the projects.
         /// </summary>
         /// <param name="client">
         /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
         /// </param>
         /// <param name="sessionId">
-        /// 
+        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
         /// </param>
         public static ProjectDisplayData[] GetProjects(CxSDKWebServiceSoapClient client, string sessionId)
         {
@@ -45,6 +91,99 @@ namespace CheckmarxReports
             }
 
             return response.projectList;
+        }
+
+        /// <summary>
+        /// Get the scans.
+        /// </summary>
+        /// <param name="client">
+        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
+        /// </param>
+        /// <param name="sessionId">
+        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
+        /// </param>
+        public static ProjectScannedDisplayData[] GetProjectScans(CxSDKWebServiceSoapClient client, string sessionId)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                throw new ArgumentNullException(nameof(sessionId));
+            }
+
+            CxWSResponseProjectScannedDisplayData response = client.GetProjectScannedDisplayData(sessionId);
+            if (!response.IsSuccesfull)
+            {
+                throw new CheckmarxErrorException(response.ErrorMessage);
+            }
+
+            return response.ProjectScannedList;
+        }
+
+        /// <summary>
+        /// Get the report contents.
+        /// </summary>
+        /// <param name="client">
+        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
+        /// </param>
+        /// <param name="sessionId">
+        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="reportId">
+        /// The report ID returned from <see cref="CreateScanReport"/>.
+        /// </param>
+        public static byte[] GetScanReport(CxSDKWebServiceSoapClient client, string sessionId, long reportId)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                throw new ArgumentNullException(nameof(sessionId));
+            }
+
+            CxWSResponseScanResults response = client.GetScanReport(sessionId, reportId);
+            if (!response.IsSuccesfull)
+            {
+                throw new CheckmarxErrorException(response.ErrorMessage);
+            }
+
+            return response.ScanResults;
+        }
+
+        /// <summary>
+        /// See if a report has been generated yet or has failed.
+        /// </summary>
+        /// <param name="client">
+        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
+        /// </param>
+        /// <param name="sessionId">
+        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="reportId">
+        /// The report ID returned from <see cref="CreateScanReport"/>.
+        /// </param>
+        public static CxWSReportStatusResponse GetScanReportStatus(CxSDKWebServiceSoapClient client, string sessionId, long reportId)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                throw new ArgumentNullException(nameof(sessionId));
+            }
+
+            CxWSReportStatusResponse response = client.GetScanReportStatus(sessionId, reportId);
+            if (!response.IsSuccesfull)
+            {
+                throw new CheckmarxErrorException(response.ErrorMessage);
+            }
+
+            return response;
         }
 
         /// <summary>
@@ -74,13 +213,13 @@ namespace CheckmarxReports
 
             using (CxWSResolverSoapClient client = new CxWSResolverSoapClient(binding, endpointAddress))
             {
-                CxWSResponseDiscovery responseDiscovery = client.GetWebServiceUrl(CxWsResolver.CxClientType.SDK, CheckmarxApiVersion);
-                if (!responseDiscovery.IsSuccesfull)
+                CxWSResponseDiscovery response = client.GetWebServiceUrl(CxWsResolver.CxClientType.SDK, CheckmarxApiVersion);
+                if (!response.IsSuccesfull)
                 {
-                    throw new CheckmarxErrorException(responseDiscovery.ErrorMessage);
+                    throw new CheckmarxErrorException(response.ErrorMessage);
                 }
 
-                return new Uri(responseDiscovery.ServiceURL, UriKind.Absolute);
+                return new Uri(response.ServiceURL, UriKind.Absolute);
             }
         }
 
