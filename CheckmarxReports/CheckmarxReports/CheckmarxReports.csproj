@@ -55,9 +55,10 @@
     <Compile Include="CheckmarxException.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="ICheckmarxApiSession.cs" />
+    <Compile Include="IReportRunner{T}.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportFactory.cs" />
+    <Compile Include="ReportRunner.cs" />
     <Compile Include="ScanResult.cs" />
     <Compile Include="Service References\CxSDKWebService\Reference.cs">
       <AutoGen>True</AutoGen>

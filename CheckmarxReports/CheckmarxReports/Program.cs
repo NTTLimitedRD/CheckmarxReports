@@ -29,6 +29,8 @@ namespace CheckmarxReports
         {
             ParserResult<CommandLineOptions> parserResult;
 
+            // We can add other reports in the future using commands or a "--report REPORT" option.
+
             parserResult = Parser.Default.ParseArguments<CommandLineOptions>(args);
             return parserResult.MapResult(
                 options =>
@@ -82,10 +84,15 @@ namespace CheckmarxReports
                 throw new ArgumentNullException(nameof(output));
             }
 
-            ReportFactory reportFactory;
+            ReportRunner reportFactory;
+            IList<ScanResult> confirmedOrUnverifiedScanResults;
 
-            reportFactory = new ReportFactory(hostName, userName, password);
-            reportFactory.Run(output);
+            reportFactory = new ReportRunner();
+
+            using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(hostName, userName, password))
+            {
+                confirmedOrUnverifiedScanResults = reportFactory.Run(checkmarxApiSession);
+            }
         }
     }
 }
