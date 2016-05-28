@@ -55,6 +55,7 @@
     <Compile Include="ScanResultTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NotFalsePositiveResultsReportRunnerTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
