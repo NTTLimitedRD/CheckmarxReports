@@ -29,8 +29,6 @@ namespace CheckmarxReports
         {
             ParserResult<CommandLineOptions> parserResult;
 
-            // We can add other reports in the future using commands or a "--report REPORT" option.
-
             parserResult = Parser.Default.ParseArguments<CommandLineOptions>(args);
             return parserResult.MapResult(
                 options =>
@@ -41,7 +39,8 @@ namespace CheckmarxReports
                             ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Create))
                         using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
                         {
-                            RunReport(options.HostName, options.UserName, options.Password, output);
+                            // We can add other reports in the future using commands or a "--report REPORT" option.
+                            RunNotFalsePositiveReport(options.HostName, options.UserName, options.Password, output);
                         }
                         return 0;
                     }
@@ -61,21 +60,35 @@ namespace CheckmarxReports
         /// <summary>
         /// Run the report.
         /// </summary>
-        /// <param name="hostName"></param>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        /// <param name="output"></param>
-        private static void RunReport(string hostName, string userName, string password, TextWriter output)
+        /// <param name="hostName">
+        /// The Checkmarx server name. Cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="userName">
+        /// The username to login with. Cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="password">
+        /// The password to login with. Cannot be null.
+        /// </param>
+        /// <param name="output">
+        /// A <see cref="TextWriter"/> to write the results to. Cannot be null.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="hostName"/> and <paramref name="userName"/> cannot be null, empty or whitespace.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="password"/> and <paramref name="output"/> cannot be null.
+        /// </exception>
+        private static void RunNotFalsePositiveReport(string hostName, string userName, string password, TextWriter output)
         {
             if (string.IsNullOrWhiteSpace(hostName))
             {
-                throw new ArgumentNullException(nameof(hostName));
+                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(hostName));
             }
             if (string.IsNullOrWhiteSpace(userName))
             {
-                throw new ArgumentNullException(nameof(userName));
+                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(userName));
             }
-            if (string.IsNullOrWhiteSpace(password))
+            if (password == null)
             {
                 throw new ArgumentNullException(nameof(password));
             }
@@ -84,14 +97,14 @@ namespace CheckmarxReports
                 throw new ArgumentNullException(nameof(output));
             }
 
-            ReportRunner reportFactory;
-            IList<ScanResult> confirmedOrUnverifiedScanResults;
+            NotFalsePositiveResultsReportRunner reportFactory;
+            IList<ScanResult> notFalsePositiveScanResults;
 
-            reportFactory = new ReportRunner();
+            reportFactory = new NotFalsePositiveResultsReportRunner();
 
             using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(hostName, userName, password))
             {
-                confirmedOrUnverifiedScanResults = reportFactory.Run(checkmarxApiSession);
+                notFalsePositiveScanResults = reportFactory.Run(checkmarxApiSession);
             }
         }
     }

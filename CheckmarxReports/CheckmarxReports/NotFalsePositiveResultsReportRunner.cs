@@ -11,9 +11,9 @@ using CheckmarxReports.CxSDKWebService;
 namespace CheckmarxReports
 {
     /// <summary>
-    /// Get a list of false positives from the server.
+    /// Get a list of non false positives from the server.
     /// </summary>
-    public class ReportRunner: IReportRunner<ScanResult>
+    public class NotFalsePositiveResultsReportRunner: IReportRunner<ScanResult>
     {
         /// <summary>
         /// Run the report.

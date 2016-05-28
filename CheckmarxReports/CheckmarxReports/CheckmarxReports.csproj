@@ -58,7 +58,7 @@
     <Compile Include="IReportRunner{T}.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportRunner.cs" />
+    <Compile Include="NotFalsePositiveResultsReportRunner.cs" />
     <Compile Include="ScanResult.cs" />
     <Compile Include="Service References\CxSDKWebService\Reference.cs">
       <AutoGen>True</AutoGen>
