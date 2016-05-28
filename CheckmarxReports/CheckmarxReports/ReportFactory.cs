@@ -73,10 +73,12 @@ namespace CheckmarxReports
             get; set;
         }
 
-        public void Run(TextWriter output)
+        public IList<ScanResult> Run(TextWriter output)
         {
             ProjectScannedDisplayData[] projects;
+            List<ScanResult> result;
 
+            result = new List<ScanResult>();
             using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(HostName, UserName, Password))
             {
                 projects = checkmarxApiSession.GetProjectScans();
@@ -126,6 +128,8 @@ namespace CheckmarxReports
                     }
                 }
             }
+
+            return result.AsReadOnly();
         }
     }
 }

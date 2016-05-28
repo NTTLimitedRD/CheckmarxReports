@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="CheckmarxApiSessionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScanResultTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

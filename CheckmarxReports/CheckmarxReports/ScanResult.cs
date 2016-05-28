@@ -14,14 +14,17 @@ namespace CheckmarxReports
         /// <summary>
         /// Create a <see cref="ScanResult"/>.
         /// </summary>
+        /// <param name="projectName">
+        /// The name of the Checkmarx project this scan occurred on. This cannot be null, empty or whitespace.
+        /// </param>
         /// <param name="ruleName">
-        /// The Checkmarx rule name.
+        /// The Checkmarx rule name. This cannot be null, empty or whitespace.
         /// </param>
         /// <param name="severity">
-        /// The severity. usually "High", "Medium" or "Low".
+        /// The severity. usually "High", "Medium" or "Low". This cannot be null, empty or whitespace.
         /// </param>
         /// <param name="filePath">
-        /// The file path.
+        /// The file path. This cannot be null, empty or whitespace.
         /// </param>
         /// <param name="line">
         /// The line number.
@@ -30,10 +33,17 @@ namespace CheckmarxReports
         /// The URL to the Checkmarx result.
         /// </param>
         /// <param name="status">
-        /// The status, usually "New" or "Recurrent".
+        /// The status, usually "New" or "Recurrent". This cannot be null, empty or whitespace.
         /// </param>
-        public ScanResult(string ruleName, string severity, string filePath, string line, string deepLink, string status)
+        /// <param name="falsePositive">
+        /// True if a Checkmarx user has marked this as "Not Vulnerable", false otherwise.
+        /// </param>
+        public ScanResult(string projectName, string ruleName, string severity, string filePath, uint line, Uri deepLink, string status, bool falsePositive)
         {
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                throw new ArgumentException("Argument is null or whitespace", nameof(projectName));
+            }
             if (string.IsNullOrWhiteSpace(ruleName))
             {
                 throw new ArgumentException("Argument is null or whitespace", nameof(ruleName));
@@ -46,26 +56,29 @@ namespace CheckmarxReports
             {
                 throw new ArgumentException("Argument is null or whitespace", nameof(filePath));
             }
-            if (string.IsNullOrWhiteSpace(line))
+            if (deepLink == null)
             {
-                throw new ArgumentException("Argument is null or whitespace", nameof(line));
-            }
-            if (string.IsNullOrWhiteSpace(deepLink))
-            {
-                throw new ArgumentException("Argument is null or whitespace", nameof(deepLink));
+                throw new ArgumentNullException(nameof(deepLink));
             }
             if (string.IsNullOrWhiteSpace(status))
             {
                 throw new ArgumentException("Argument is null or whitespace", nameof(status));
             }
 
+            ProjectName = projectName;
             RuleName = ruleName;
             Severity = severity;
             FilePath = filePath;
             Line = line;
             DeepLink = deepLink;
             Status = status;
+            FalsePositive = falsePositive;
         }
+
+        /// <summary>
+        /// The name of the Checkmarx project this scan occurred on.
+        /// </summary>
+        public string ProjectName { get; set; }
 
         /// <summary>
         /// The Checkmarx rule name.
@@ -85,16 +98,21 @@ namespace CheckmarxReports
         /// <summary>
         /// The line number.
         /// </summary>
-        public string Line { get; private set; }
+        public uint Line { get; private set; }
 
         /// <summary>
         /// The URL to the Checkmarx result.
         /// </summary>
-        public string DeepLink { get; private set; }
+        public Uri DeepLink { get; private set; }
 
         /// <summary>
         /// The status, usually "New" or "Recurrent".
         /// </summary>
         public string Status { get; private set; }
+
+        /// <summary>
+        /// True if a Checkmarx user has marked this as "Not Vulnerable", false otherwise.
+        /// </summary>
+        public bool FalsePositive { get; set; }
     }
 }
