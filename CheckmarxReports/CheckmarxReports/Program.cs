@@ -108,7 +108,7 @@ namespace CheckmarxReports
             }
 
             reportResultFormatter = new ReportResultFormatter();
-            reportResultFormatter.Format(notFalsePositiveScanResults, output);
+            reportResultFormatter.Format(notFalsePositiveScanResults, output, hostName, userName);
         }
     }
 }
