@@ -124,11 +124,6 @@ namespace CheckmarxReports
 
                         output.WriteLine($"{ruleName} ({severity}, {status}): {fileName} ({line}) Link: {deepLink}");
                     }
-
-                    // TODO: Look at //Result/@FalsePositive="False" nodes, specifically the @DeepLink attribte
-
-                    output.WriteLine(Encoding.UTF8.GetString(report));
-                    output.Flush();
                 }
             }
         }
