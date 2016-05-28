@@ -98,14 +98,17 @@ namespace CheckmarxReports
             }
 
             NotFalsePositiveResultsReportRunner reportFactory;
+            ReportResultFormatter reportResultFormatter;
             IList<ScanResult> notFalsePositiveScanResults;
 
             reportFactory = new NotFalsePositiveResultsReportRunner();
-
             using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(hostName, userName, password))
             {
                 notFalsePositiveScanResults = reportFactory.Run(checkmarxApiSession);
             }
+
+            reportResultFormatter = new ReportResultFormatter();
+            reportResultFormatter.Format(notFalsePositiveScanResults, output);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace CheckmarxReports
         [Option('p', "password", Required = true, HelpText = "Password.", MetaValue = "PASSWORD")]
         public string Password { get; set; }
 
-        [Option('o', "output-file", Required = false, HelpText = "Output file path.", MetaValue = "OUTPUT.TXT")]
+        [Option('o', "output-file", Required = false, HelpText = "Output file path.", MetaValue = "OUTPUT.HTML")]
         public string OutputPath { get; set; }
     }
 }
