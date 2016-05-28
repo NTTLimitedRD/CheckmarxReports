@@ -284,6 +284,7 @@ namespace CheckmarxReports
             EndpointAddress endpointAddress;
 
             binding = new BasicHttpBinding(BasicHttpSecurityMode.Transport);
+            binding.MaxReceivedMessageSize = 4*1024*1024; // 4 MB
             endpointAddress = new EndpointAddress(sdkUrl);
 
             return new CxSDKWebServiceSoapClient(binding, endpointAddress);

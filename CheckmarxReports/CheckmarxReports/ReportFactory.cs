@@ -89,14 +89,13 @@ namespace CheckmarxReports
                     // Generate an XML scan report
                     long reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
 
-                    // Extract whether there are any issues that are "New" or "Unconfirmed"
                     // TODO: Consider a timeout
-                    for (;;)
+                    for(;;)
                     {
                         CxWSReportStatusResponse reportStatusResponse = checkmarxApiSession.GetScanReportStatus(reportId);
                         if (reportStatusResponse.IsFailed)
                         {
-                            throw new CheckmarxErrorException("Generating report ID {reportID} on scan {project.LastScanId} on project {project.ProjectName} failed");
+                            throw new CheckmarxErrorException($"Generating report ID {reportId} on scan {project.LastScanID} on project {project.ProjectName} failed");
                         }
                         else if (reportStatusResponse.IsReady)
                         {
@@ -107,12 +106,24 @@ namespace CheckmarxReports
                         System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
                     }
 
+                    // Extract whether there are any issues that are "New" or "Unconfirmed", i.e. are not false positives
                     byte[] report = checkmarxApiSession.GetScanReport(reportId);
-                    //XmlDocument xmlDocument = new XmlDocument();
-                    //using (MemoryStream memoryStream = new MemoryStream(report))
-                    //{
-                    //    xmlDocument.Load(memoryStream);
-                    //}
+                    XmlDocument xmlDocument = new XmlDocument();
+                    using (MemoryStream memoryStream = new MemoryStream(report))
+                    {
+                        xmlDocument.Load(memoryStream);
+                    }
+                    foreach (XmlNode xmlNode in xmlDocument.SelectNodes("//Result[@FalsePositive=\"False\"]"))
+                    {
+                        string ruleName = xmlNode?.ParentNode?.Attributes["name"]?.Value ?? "(none)";
+                        string severity = xmlNode?.ParentNode?.Attributes["Severity"]?.Value ?? "(none)";
+                        string fileName = xmlNode?.Attributes["FileName"]?.Value ?? "(none)";
+                        string line = xmlNode?.Attributes["Line"]?.Value ?? "(none)";
+                        string deepLink = xmlNode?.Attributes["DeepLink"]?.Value ?? "";
+                        string status = xmlNode?.Attributes["Status"]?.Value ?? "(none)";
+
+                        output.WriteLine($"{ruleName} ({severity}, {status}): {fileName} ({line}) Link: {deepLink}");
+                    }
 
                     // TODO: Look at //Result/@FalsePositive="False" nodes, specifically the @DeepLink attribte
 
