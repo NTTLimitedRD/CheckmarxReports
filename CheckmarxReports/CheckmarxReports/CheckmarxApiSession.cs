@@ -6,14 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using CheckmarxReports.CxSDKWebService;
 using CheckmarxReports.CxWsResolver;
-using CxClientType = CheckmarxReports.CxSDKWebService.CxClientType;
 
 namespace CheckmarxReports
 {
     /// <summary>
-    /// Wrappers for the individual Checkmarx web methods.
+    /// Wrappers for the Checkmarx SDK web API methods.
     /// </summary>
-    public class CheckmarxApiSession: IDisposable
+    public class CheckmarxApiSession: ICheckmarxApiSession
     {
         private const int CheckmarxApiVersion = 1;
         private const int CheckmarxLocaleId = 1033; // US English
@@ -23,15 +22,15 @@ namespace CheckmarxReports
         /// Create a new <see cref="CheckmarxApiSession"/>.
         /// </summary>
         /// <param name="server">
-        /// The name of the Checkmarx server. This cannot be null, empty or whitespace.
+        /// The Checkmarx server name. This cannot be null, empty or whitespace.
         /// </param>
         /// <param name="username">
-        /// The user name to login with. This cannot be null, empty or whitespace.
+        /// The username to login with. This cannot be null, empty or whitespace.
         /// </param>
         /// <param name="password">
         /// The password to login with. This cannot be null, empty or whitespace.
         /// </param>
-        /// <exception cref="ArgumentNullException">
+        /// <exception cref="ArgumentException">
         /// No argument can be null, empty or whitespace.
         /// </exception>
         /// <exception cref="CheckmarxErrorException">
@@ -40,26 +39,26 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxCommunicationException">
         /// An error occurred communicating with the Checkmarx server.
         /// </exception>
-        public CheckmarxApiSession(string server, string userName, string password)
+        public CheckmarxApiSession(string server, string username, string password)
         {
             if (string.IsNullOrWhiteSpace(server))
             {
-                throw new ArgumentNullException(nameof(server));
+                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(server));
             }
-            if (string.IsNullOrWhiteSpace(userName))
+            if (string.IsNullOrWhiteSpace(username))
             {
-                throw new ArgumentNullException(nameof(userName));
+                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(username));
             }
             if (string.IsNullOrWhiteSpace(password))
             {
-                throw new ArgumentNullException(nameof(password));
+                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(password));
             }
 
             Uri sdkUrl;
 
             sdkUrl = GetSdkUrl(server);
             SoapClient = GetSoapClient(sdkUrl);
-            SessionId = Login(userName, password);
+            SessionId = Login(username, password);
         }
 
         /// <summary>
@@ -116,12 +115,12 @@ namespace CheckmarxReports
         /// <summary>
         /// The <see cref="CxSDKWebServiceSoapClient"/> used to call Checkmarx APIs.
         /// </summary>
-        private CxSDKWebServiceSoapClient SoapClient { get; }
+        internal CxSDKWebServiceSoapClient SoapClient { get; }
 
         /// <summary>
         /// The ID of the current session returned from <see cref="Login"/>.
         /// </summary>
-        private string SessionId { get; set; }
+        internal string SessionId { get; set; }
 
         /// <summary>
         /// Start creating a scan report.
@@ -360,7 +359,7 @@ namespace CheckmarxReports
         /// Wrap Checkmarx API calls to handle errors and convert exceptions.
         /// </summary>
         /// <typeparam name="TResult">
-        /// The return type of the call. Must inherit from <see cref="xSDKWebService.CxWSBasicRepsonse"/>.
+        /// The return type of the call. Must inherit from <see cref="CxSDKWebService.CxWSBasicRepsonse"/>.
         /// </typeparam>
         /// <param name="apiCall">
         /// A <see cref="Func{TResult}"/> that actually does the API call. This cannot be null.
@@ -369,7 +368,7 @@ namespace CheckmarxReports
         /// The call response.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// No argument can be null. <paramref name="sessionId"/> cannot be empty or whitespace.
+        /// No argument can be null.
         /// </exception>
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
@@ -397,6 +396,7 @@ namespace CheckmarxReports
             }
             catch (CommunicationException ex)
             {
+                // Wrap this exception so callers do not need WCF references.
                 throw new CheckmarxCommunicationException(ex.Message, ex);
             }
         }
