@@ -54,3 +54,7 @@ Note:
  1. The code runs reports in parallel, up to 3 at a time.
  1. The code requires C# 6.0 as it uses interpolated strings and the `nameof` keyword. It has only been run in Visual Studio 2015 running on Windows 10 and Windows 2012 R2.
  1. There are limited automated tests.
+
+## Contact
+
+Anthony Langsworth (anthony.langsworth@dimensiondata.com)
