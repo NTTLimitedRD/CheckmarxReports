@@ -141,7 +141,7 @@ namespace CheckmarxReports
             string falsePositiveString;
             bool falsePositive;
 
-            ruleName = xmlNode?.Parent?.Attribute(XName.Get("name"))?.Value;
+            ruleName = xmlNode.Parent?.Attribute(XName.Get("name"))?.Value;
             if (string.IsNullOrWhiteSpace(ruleName))
             {
                 throw new CheckmarxErrorException(
