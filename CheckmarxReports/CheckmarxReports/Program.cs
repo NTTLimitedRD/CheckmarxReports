@@ -134,9 +134,13 @@ namespace CheckmarxReports
                 case OutputFormat.Html:
                     reportResultFormatter = new HtmlScanResultFormatter();
                     break;
+                case OutputFormat.Csv:
+                    reportResultFormatter = new CsvScanResultFormatter();
+                    break;
                 default:
-                    throw new NotSupportedException("Non-HTML formatters are not supported");
+                    throw new NotSupportedException("Unknown formatter");
             }
+
             return reportResultFormatter;
         }
     }

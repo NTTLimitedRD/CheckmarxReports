@@ -58,6 +58,7 @@
     <Compile Include="CheckmarxCommunicationException.cs" />
     <Compile Include="CheckmarxErrorException.cs" />
     <Compile Include="CheckmarxException.cs" />
+    <Compile Include="CsvScanResultFormatter.cs" />
     <Compile Include="NotFalsePositiveReportOptions.cs" />
     <Compile Include="ICheckmarxApiSession.cs" />
     <Compile Include="IReportResultFormatter.cs" />
