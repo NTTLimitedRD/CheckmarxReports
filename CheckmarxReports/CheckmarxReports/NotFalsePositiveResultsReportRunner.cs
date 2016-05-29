@@ -129,28 +129,58 @@ namespace CheckmarxReports
         private ScanResult XmlNodeToScanResult(XElement xmlNode, string projectName)
         {
             string ruleName;
-            string severity;
+            string severityString;
+            Severity severity;
             string fileName;
+            string lineString;
             uint line;
+            string deepLinkString;
             Uri deepLink;
-            string status;
+            string statusString;
+            Status status;
+            string falsePositiveString;
             bool falsePositive;
 
-            ruleName = xmlNode?.Parent?.Attribute(XName.Get("name"))?.Value ?? "(none)";
-            severity = xmlNode?.Parent?.Attribute(XName.Get("Severity"))?.Value ?? "(none)";
-            fileName = xmlNode?.Attribute(XName.Get("FileName"))?.Value ?? "(none)";
-            if (!uint.TryParse(xmlNode?.Attribute(XName.Get("Line"))?.Value ?? "0", out line))
+            ruleName = xmlNode?.Parent?.Attribute(XName.Get("name"))?.Value;
+            if (string.IsNullOrWhiteSpace(ruleName))
             {
-                throw new CheckmarxErrorException($"Line XML attribute for result in project {projectName} omitted or is not an integer");
+                throw new CheckmarxErrorException(
+                    $"FileName XML attribute '{ruleName ?? "(null)"}' for result in project {projectName} omitted or is invalid");
             }
-            if (!Uri.TryCreate(xmlNode?.Attribute(XName.Get("DeepLink"))?.Value ?? "", UriKind.Absolute, out deepLink))
+            severityString = xmlNode.Parent?.Attribute(XName.Get("Severity"))?.Value;
+            if (!Enum.TryParse(severityString, true, out severity))
             {
-                throw new CheckmarxErrorException($"DeepLink XML attribute for result in project {projectName} omitted or is not a valid URL");
+                throw new CheckmarxErrorException(
+                    $"Severity XML attribute '{severityString ?? "(null)"}' for result in project {projectName} omitted or is not a valid status");
             }
-            status = xmlNode?.Attribute(XName.Get("Status"))?.Value ?? "(none)";
-            if (!bool.TryParse(xmlNode?.Attribute(XName.Get("FalsePositive"))?.Value ?? "", out falsePositive))
+            fileName = xmlNode.Attribute(XName.Get("FileName"))?.Value;
+            if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new CheckmarxErrorException($"FalsePositive XML attribute for result in project {projectName} omitted or is not a valid boolean");
+                throw new CheckmarxErrorException(
+                    $"FileName XML attribute '{fileName ?? "(null)"}' for result in project {projectName} omitted or is invalid");
+            }
+            lineString = xmlNode.Attribute(XName.Get("Line"))?.Value;
+            if (!uint.TryParse(lineString, out line))
+            {
+                throw new CheckmarxErrorException(
+                    $"Line XML attribute '{lineString ?? "(null)"}' for result in project {projectName} omitted or is not a positive integer");
+            }
+            deepLinkString = xmlNode.Attribute(XName.Get("DeepLink"))?.Value;
+            if (!Uri.TryCreate(deepLinkString, UriKind.Absolute, out deepLink))
+            {
+                throw new CheckmarxErrorException(
+                    $"DeepLink XML attribute '{deepLinkString ?? "(null)"}' for result in project {projectName} omitted or is not a valid URL");
+            }
+            statusString = xmlNode.Attribute(XName.Get("Status"))?.Value;
+            if (!Enum.TryParse(statusString, true, out status))
+            {
+                throw new CheckmarxErrorException(
+                    $"Status XML attribute '{statusString ?? "(null)"}' for result in project {projectName} omitted or is not a valid status");
+            }
+            falsePositiveString = xmlNode.Attribute(XName.Get("FalsePositive"))?.Value;
+            if (!bool.TryParse(falsePositiveString, out falsePositive))
+            {
+                throw new CheckmarxErrorException($"FalsePositive XML attribute '{falsePositiveString ?? "(null)"}' for result in project {projectName} omitted or is not a valid boolean");
             }
 
             try

@@ -159,18 +159,18 @@ namespace CheckmarxReports
 
         private void WriteRow(HtmlTextWriter htmlTextWriter, ScanResult scanResult)
         {
-            if (scanResult.Severity == "High")
+            if (scanResult.Severity == Severity.High)
             {
                 htmlTextWriter.AddAttribute(HtmlTextWriterAttribute.Class, "danger");
             }
-            else if (scanResult.Severity == "Medium")
+            else if (scanResult.Severity == Severity.Medium)
             {
                 htmlTextWriter.AddAttribute(HtmlTextWriterAttribute.Class, "warning");
             }
 
             htmlTextWriter.RenderBeginTag(HtmlTextWriterTag.Tr);
             htmlTextWriter.RenderBeginTag(HtmlTextWriterTag.Td);
-            htmlTextWriter.Write(scanResult.Status == "New" ? "New" : "");
+            htmlTextWriter.Write(scanResult.Status == Status.New ? "New" : "");
             htmlTextWriter.RenderEndTag();
             htmlTextWriter.RenderBeginTag(HtmlTextWriterTag.Td);
             htmlTextWriter.Write(scanResult.ProjectName);

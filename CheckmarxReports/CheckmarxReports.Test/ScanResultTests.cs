@@ -16,11 +16,11 @@ namespace CheckmarxReports.Test
             ScanResult scanResult;
             const string projectName = "project";
             const string ruleName = "rule";
-            const string severity = "severity";
+            const Severity severity = Severity.Medium;
             const string filePath = "file";
             const uint line = 1234;
             Uri deepLink = new Uri("https://checkmarx/path/to/result");
-            const string status = "status";
+            const Status status = Status.Recurrent;
             const bool falsePositive = true;
 
             scanResult = new ScanResult(projectName, ruleName, severity, filePath, line, deepLink, status, falsePositive);
@@ -39,7 +39,7 @@ namespace CheckmarxReports.Test
         [TestCase(" ")]
         public void Ctor_InvalidProjectName(string projectName)
         {
-            Assert.That(() => new ScanResult(projectName, "rule", "severity", "filePath", 5678, new Uri("http://a/b"), "status", true),
+            Assert.That(() => new ScanResult(projectName, "rule", Severity.High, "filePath", 5678, new Uri("http://a/b"), Status.Recurrent, true),
                 Throws.ArgumentException.And.Property("ParamName").EqualTo("projectName"));
         }
 
@@ -48,34 +48,15 @@ namespace CheckmarxReports.Test
         [TestCase(" ")]
         public void Ctor_InvalidRuleName(string ruleName)
         {
-            Assert.That(() => new ScanResult("projectName", ruleName, "severity", "filePath", 5678, new Uri("http://a/b"), "status", true),
+            Assert.That(() => new ScanResult("projectName", ruleName, Severity.High, "filePath", 5678, new Uri("http://a/b"), Status.Recurrent, true),
                 Throws.ArgumentException.And.Property("ParamName").EqualTo("ruleName"));
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase(" ")]
-        public void Ctor_InvalidSeverity(string severity)
-        {
-            Assert.That(() => new ScanResult("projectName", "ruleName", severity, "filePath", 5678, new Uri("http://a/b"), "status", true),
-                Throws.ArgumentException.And.Property("ParamName").EqualTo("severity"));
         }
 
         [Test]
         public void Ctor_NullDeepLink()
         {
-            Assert.That(() => new ScanResult("projectName", "ruleName", "severity", "filePath", 5678, null, "status", true),
+            Assert.That(() => new ScanResult("projectName", "ruleName", Severity.High, "filePath", 5678, null, Status.Recurrent, true),
                 Throws.ArgumentNullException.And.Property("ParamName").EqualTo("deepLink"));
         }
-
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase(" ")]
-        public void Ctor_InvalidStatus(string status)
-        {
-            Assert.That(() => new ScanResult("projectName", "ruleName", "severity", "filePath", 5678, new Uri("http://a/b"), status, true),
-                Throws.ArgumentException.And.Property("ParamName").EqualTo("status"));
-        }
-
     }
 }
