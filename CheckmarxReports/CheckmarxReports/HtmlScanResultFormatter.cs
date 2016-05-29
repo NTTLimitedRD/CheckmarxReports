@@ -13,7 +13,7 @@ namespace CheckmarxReports
     /// Convert the report results from a list of <see cref="ScanResult"/> human readable results 
     /// in the given <see cref="TextWriter"/>.
     /// </summary>
-    public class ReportResultFormatter: IReportResultFormatter<ScanResult>
+    public class HtmlScanResultFormatter: IReportResultFormatter<ScanResult>
     {
         /// <summary>
         /// Format the report results.

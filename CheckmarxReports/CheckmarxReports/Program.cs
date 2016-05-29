@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
-using CheckmarxReports.CxWsResolver;
 using CommandLine;
-using CommandLine.Text;
 
 namespace CheckmarxReports
 {
@@ -32,41 +28,30 @@ namespace CheckmarxReports
         {
             int result = ExitFailure;
 
-            Parser.Default
-                .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions>(args)
-                .WithParsed<NotFalsePositiveReportOptions>(options =>
-                    {
-                        try
+            try
+            {
+                Parser.Default
+                    .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions>(args)
+                    .WithParsed<NotFalsePositiveReportOptions>(options =>
                         {
-                            using (Stream stream = string.IsNullOrWhiteSpace(options.OutputPath)
-                                ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Create))
-                            using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
-                            {
-                                RunNotFalsePositiveReport(options.Server, options.UserName, options.Password, output);
-                            }
+                            RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options), 
+                                options.Server, options.UserName, options.Password, options.OutputPath);
                             result = ExitSuccess;
-                        }
-                        catch (Exception ex)
+                        })
+                    .WithParsed<RawScanResultXmlOptions>(options =>
                         {
-                            Console.Error.WriteLine(ex.Message);
-                        }
-                    })
-                .WithParsed<RawScanResultXmlOptions>(options =>
-                {
-                    try
-                    {
-                        throw new NotImplementedException();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine(ex.Message);
-                    }
-                })
-                .WithNotParsed(
-                    errors =>
-                    {
-                        Console.Error.WriteLine(errors.First());
-                    });
+                            throw new NotImplementedException();
+                        })
+                    .WithNotParsed(
+                        errors =>
+                        {
+                            Console.Error.WriteLine(errors.First());
+                        });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
 
             return result;
         }
@@ -74,7 +59,13 @@ namespace CheckmarxReports
         /// <summary>
         /// Run the report.
         /// </summary>
-        /// <param name="hostName">
+        /// <param name="reportRunner">
+        /// A <see cref="IReportRunner{TReportResult}"/> to run the report. This cannot be null.
+        /// </param>
+        /// <param name="reportResultFormatter">
+        /// A <see cref="IReportResultFormatter{TReportResult}"/> to format the report results. This cannot be null.
+        /// </param>
+        /// <param name="server">
         /// The Checkmarx server name. Cannot be null, empty or whitespace.
         /// </param>
         /// <param name="userName">
@@ -83,20 +74,29 @@ namespace CheckmarxReports
         /// <param name="password">
         /// The password to login with. Cannot be null.
         /// </param>
-        /// <param name="output">
-        /// A <see cref="TextWriter"/> to write the results to. Cannot be null.
+        /// <param name="outputPath">
+        /// An optional file to write the output to.
         /// </param>
         /// <exception cref="ArgumentException">
-        /// <paramref name="hostName"/> and <paramref name="userName"/> cannot be null, empty or whitespace.
+        /// <paramref name="server"/> and <paramref name="userName"/> cannot be null, empty or whitespace.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="password"/> and <paramref name="output"/> cannot be null.
+        /// <paramref name="reportRunner"/>, <paramref name="reportResultFormatter"/> and <paramref name="password"/> and  cannot be null.
         /// </exception>
-        private static void RunNotFalsePositiveReport(string hostName, string userName, string password, TextWriter output)
+        private static void RunReport<TReportResult>(IReportRunner<TReportResult> reportRunner, IReportResultFormatter<TReportResult> reportResultFormatter, 
+            string server, string userName, string password, string outputPath)
         {
-            if (string.IsNullOrWhiteSpace(hostName))
+            if (reportRunner == null)
             {
-                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(hostName));
+                throw new ArgumentNullException(nameof(reportRunner));
+            }
+            if (reportResultFormatter == null)
+            {
+                throw new ArgumentNullException(nameof(reportResultFormatter));
+            }
+            if (string.IsNullOrWhiteSpace(server))
+            {
+                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(server));
             }
             if (string.IsNullOrWhiteSpace(userName))
             {
@@ -106,23 +106,38 @@ namespace CheckmarxReports
             {
                 throw new ArgumentNullException(nameof(password));
             }
-            if (output == null)
+
+            using (Stream stream = string.IsNullOrWhiteSpace(outputPath)
+                ? Console.OpenStandardOutput() : new FileStream(outputPath, FileMode.Create))
+            using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
+            using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(server, userName, password))
             {
-                throw new ArgumentNullException(nameof(output));
+                reportResultFormatter.Format(reportRunner.Run(checkmarxApiSession), output, server, userName);
             }
+        }
 
-            NotFalsePositiveResultsReportRunner reportFactory;
-            ReportResultFormatter reportResultFormatter;
-            IList<ScanResult> notFalsePositiveScanResults;
+        /// <summary>
+        /// Get the appropruate <see cref="IReportResultFormatter{TReportResult}"/>.
+        /// </summary>
+        /// <param name="options">
+        /// The command line options.
+        /// </param>
+        /// <returns>
+        /// The requested <see cref="IReportResultFormatter{TReportResult}"/>.
+        /// </returns>
+        private static IReportResultFormatter<ScanResult> GetReportResultFormatter(NotFalsePositiveReportOptions options)
+        {
+            IReportResultFormatter<ScanResult> reportResultFormatter;
 
-            reportFactory = new NotFalsePositiveResultsReportRunner();
-            using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(hostName, userName, password))
+            switch (options.OutputFormat)
             {
-                notFalsePositiveScanResults = reportFactory.Run(checkmarxApiSession);
+                case OutputFormat.Html:
+                    reportResultFormatter = new HtmlScanResultFormatter();
+                    break;
+                default:
+                    throw new NotSupportedException("Non-HTML formatters are not supported");
             }
-
-            reportResultFormatter = new ReportResultFormatter();
-            reportResultFormatter.Format(notFalsePositiveScanResults, output, hostName, userName);
+            return reportResultFormatter;
         }
     }
 }
