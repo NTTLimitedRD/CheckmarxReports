@@ -18,6 +18,11 @@ namespace CheckmarxReports
     public class NotFalsePositiveResultsReportRunner: IReportRunner<ScanResult>
     {
         /// <summary>
+        /// Max simultaneous report runs.
+        /// </summary>
+        public const int MaxParallelization = 3;
+
+        /// <summary>
         /// Run the report.
         /// </summary>
         /// <param name="checkmarxApiSession">
@@ -44,71 +49,13 @@ namespace CheckmarxReports
 
             return checkmarxApiSession.GetProjectScans()
                     .AsParallel()
-                    .WithDegreeOfParallelism(3)
+                    .WithDegreeOfParallelism(MaxParallelization)
                     .SelectMany(
                         project =>
-                            GenerateLastScanReport(checkmarxApiSession, project)
+                            CheckmarxApiSessionHelper.GenerateLastScanReport(checkmarxApiSession, project)
                                 .XPathSelectElements("//Result[@FalsePositive=\"False\"]")
                                 .Select(xmlNode => XmlNodeToScanResult(xmlNode, project.ProjectName)))
                     .ToList();
-        }
-
-        /// <summary>
-        /// Generate a Checkmarx scan report for the most recent scan for the given project.
-        /// </summary>
-        /// <param name="checkmarxApiSession">
-        /// The <see cref="ICheckmarxApiSession"/> to generate the report with.
-        /// </param>
-        /// <param name="project">
-        /// The project to get the last scan for
-        /// </param>
-        /// <returns>
-        /// An <see cref="XDocument"/> containing the loaded scan report.
-        /// </returns>
-        /// <exception cref="CheckmarxErrorException">
-        /// Either the report generation failed or Checkmarx returned invalid XML for the scan report.
-        /// </exception>
-        private XDocument GenerateLastScanReport(ICheckmarxApiSession checkmarxApiSession, ProjectScannedDisplayData project)
-        {
-            long reportId;
-            XDocument xDocument;
-            byte[] report;
-
-            reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
-            for (;;)
-            {
-                CxWSReportStatusResponse reportStatusResponse = checkmarxApiSession.GetScanReportStatus(reportId);
-                if (reportStatusResponse.IsFailed)
-                {
-                    throw new CheckmarxErrorException(
-                        $"Generating report ID {reportId} on scan {project.LastScanID} on project {project.ProjectName} failed");
-                }
-                else if (reportStatusResponse.IsReady)
-                {
-                    break;
-                }
-
-                // TODO: Consider a better mechanism
-                System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
-
-                // TODO: Consider a timeout
-            }
-
-            report = checkmarxApiSession.GetScanReport(reportId);
-            using (MemoryStream memoryStream = new MemoryStream(report))
-            {
-                try
-                {
-                    xDocument = XDocument.Load(memoryStream, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-                }
-                catch (XmlException ex)
-                {
-                    throw new CheckmarxErrorException(
-                        $"Checkmarx returned invalid XML for report ID {reportId} on scan {project.LastScanID} on project {project.ProjectName}", ex);
-                }
-            }
-
-            return xDocument;
         }
 
         /// <summary>

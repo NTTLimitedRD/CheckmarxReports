@@ -34,13 +34,13 @@ namespace CheckmarxReports
                     .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions>(args)
                     .WithParsed<NotFalsePositiveReportOptions>(options =>
                         {
-                            RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options), 
+                            result = RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options), 
                                 options.Server, options.UserName, options.Password, options.OutputPath);
-                            result = ExitSuccess;
                         })
                     .WithParsed<RawScanResultXmlOptions>(options =>
                         {
-                            throw new NotImplementedException();
+                            result = RunReport(new RawScanXmlReportRunner(), new TextStringFormatter(), 
+                                options.Server, options.UserName, options.Password, options.OutputPath);
                         })
                     .WithNotParsed(
                         errors =>
@@ -83,7 +83,7 @@ namespace CheckmarxReports
         /// <exception cref="ArgumentNullException">
         /// <paramref name="reportRunner"/>, <paramref name="reportResultFormatter"/> and <paramref name="password"/> and  cannot be null.
         /// </exception>
-        private static void RunReport<TReportResult>(IReportRunner<TReportResult> reportRunner, IReportResultFormatter<TReportResult> reportResultFormatter, 
+        private static int RunReport<TReportResult>(IReportRunner<TReportResult> reportRunner, IReportResultFormatter<TReportResult> reportResultFormatter, 
             string server, string userName, string password, string outputPath)
         {
             if (reportRunner == null)
@@ -114,6 +114,8 @@ namespace CheckmarxReports
             {
                 reportResultFormatter.Format(reportRunner.Run(checkmarxApiSession), output, server, userName);
             }
+
+            return ExitSuccess;
         }
 
         /// <summary>
