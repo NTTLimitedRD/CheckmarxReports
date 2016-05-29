@@ -53,17 +53,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckmarxReportOptions.cs" />
     <Compile Include="CheckmarxApiSession.cs" />
     <Compile Include="CheckmarxCommunicationException.cs" />
     <Compile Include="CheckmarxErrorException.cs" />
     <Compile Include="CheckmarxException.cs" />
-    <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="NotFalsePositiveReportOptions.cs" />
     <Compile Include="ICheckmarxApiSession.cs" />
     <Compile Include="IReportResultFormatter.cs" />
     <Compile Include="IReportRunner{T}.cs" />
+    <Compile Include="OutputFormat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NotFalsePositiveResultsReportRunner.cs" />
+    <Compile Include="RawScanResultXmlOptions.cs" />
     <Compile Include="ReportResultFormatter.cs" />
     <Compile Include="Severity.cs" />
     <Compile Include="ScanResult.cs" />

@@ -8,9 +8,9 @@ using CommandLine;
 namespace CheckmarxReports
 {
     /// <summary>
-    /// Command line options.
+    /// Base class for Checkmarx report commands.
     /// </summary>
-    public class CommandLineOptions
+    public abstract class CheckmarxReportOptions
     {
         /// <summary>
         /// Server name.

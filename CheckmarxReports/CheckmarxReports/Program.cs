@@ -30,34 +30,45 @@ namespace CheckmarxReports
         /// </returns>
         private static int Main(string[] args)
         {
-            ParserResult<CommandLineOptions> parserResult;
+            int result = ExitFailure;
 
-            parserResult = Parser.Default.ParseArguments<CommandLineOptions>(args);
-            return parserResult.MapResult(
-                options =>
+            Parser.Default
+                .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions>(args)
+                .WithParsed<NotFalsePositiveReportOptions>(options =>
+                    {
+                        try
+                        {
+                            using (Stream stream = string.IsNullOrWhiteSpace(options.OutputPath)
+                                ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Create))
+                            using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
+                            {
+                                RunNotFalsePositiveReport(options.Server, options.UserName, options.Password, output);
+                            }
+                            result = ExitSuccess;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine(ex.Message);
+                        }
+                    })
+                .WithParsed<RawScanResultXmlOptions>(options =>
                 {
                     try
                     {
-                        using (Stream stream = string.IsNullOrWhiteSpace(options.OutputPath)
-                            ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Create))
-                        using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
-                        {
-                            // We can add other reports in the future using commands or a "--report REPORT" option.
-                            RunNotFalsePositiveReport(options.Server, options.UserName, options.Password, output);
-                        }
-                        return ExitSuccess;
+                        throw new NotImplementedException();
                     }
                     catch (Exception ex)
                     {
                         Console.Error.WriteLine(ex.Message);
-                        return ExitFailure;
                     }
-                },
-                errors =>
-                {
-                    Console.Error.WriteLine(errors.First());
-                    return ExitFailure;
-                });
+                })
+                .WithNotParsed(
+                    errors =>
+                    {
+                        Console.Error.WriteLine(errors.First());
+                    });
+
+            return result;
         }
 
         /// <summary>
