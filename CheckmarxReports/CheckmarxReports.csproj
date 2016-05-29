@@ -61,8 +61,8 @@
     <Compile Include="CsvScanResultFormatter.cs" />
     <Compile Include="NotFalsePositiveReportOptions.cs" />
     <Compile Include="ICheckmarxApiSession.cs" />
-    <Compile Include="IReportResultFormatter.cs" />
-    <Compile Include="IReportRunner{T}.cs" />
+    <Compile Include="IReportResultFormatter{TReportResult}.cs" />
+    <Compile Include="IReportRunner{TReportResult}.cs" />
     <Compile Include="OutputFormat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -10,6 +10,9 @@ namespace CheckmarxReports
     /// <summary>
     /// Convert the report results to something human readable.
     /// </summary>
+    /// <typeparam name="TReportResult">
+    /// The type of entries returned from the report.
+    /// </typeparam>
     public interface IReportResultFormatter<TReportResult>
     {
         /// <summary>

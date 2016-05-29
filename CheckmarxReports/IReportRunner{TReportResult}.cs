@@ -9,8 +9,10 @@ namespace CheckmarxReports
     /// <summary>
     /// A Checkmarx report runner.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IReportRunner<T>
+    /// <typeparam name="TReportResult">
+    /// The type of entries returned from the report.
+    /// </typeparam>
+    public interface IReportRunner<TReportResult>
     {
         /// <summary>
         /// Run the report.
@@ -30,6 +32,6 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxCommunicationException">
         /// Communication with the Checkmarx server failed.
         /// </exception>
-        IList<T> Run(ICheckmarxApiSession checkmarxApiSession);
+        IList<TReportResult> Run(ICheckmarxApiSession checkmarxApiSession);
     }
 }
