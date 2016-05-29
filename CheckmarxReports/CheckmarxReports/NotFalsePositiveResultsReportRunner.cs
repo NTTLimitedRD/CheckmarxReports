@@ -6,6 +6,8 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using CheckmarxReports.CxSDKWebService;
 
 namespace CheckmarxReports
@@ -40,26 +42,15 @@ namespace CheckmarxReports
                 throw new ArgumentNullException(nameof(checkmarxApiSession));
             }
 
-            ProjectScannedDisplayData[] projects;
-            List<ScanResult> result;
-
-            result = new List<ScanResult>();
-            projects = checkmarxApiSession.GetProjectScans();
-            foreach (ProjectScannedDisplayData project in projects)
-            {
-                XmlDocument xmlDocument;
-
-                // Generate an XML scan report
-                xmlDocument = GenerateLastScanReport(checkmarxApiSession, project);
-
-                // Extract whether there are any issues that are "New" or "Unconfirmed", i.e. are not false positives
-                foreach (XmlNode xmlNode in xmlDocument.SelectNodes("//Result[@FalsePositive=\"False\"]"))
-                {
-                    result.Add(XmlNodeToScanResult(xmlNode, project.ProjectName));
-                }
-            }
-
-            return result.AsReadOnly();
+            return checkmarxApiSession.GetProjectScans()
+                    .AsParallel()
+                    .WithDegreeOfParallelism(3)
+                    .SelectMany(
+                        project =>
+                            GenerateLastScanReport(checkmarxApiSession, project)
+                                .XPathSelectElements("//Result[@FalsePositive=\"False\"]")
+                                .Select(xmlNode => XmlNodeToScanResult(xmlNode, project.ProjectName)))
+                    .ToList();
         }
 
         /// <summary>
@@ -71,14 +62,16 @@ namespace CheckmarxReports
         /// <param name="project">
         /// The project to get the last scan for
         /// </param>
-        /// <returns></returns>
+        /// <returns>
+        /// An <see cref="XDocument"/> containing the loaded scan report.
+        /// </returns>
         /// <exception cref="CheckmarxErrorException">
         /// Either the report generation failed or Checkmarx returned invalid XML for the scan report.
         /// </exception>
-        private XmlDocument GenerateLastScanReport(ICheckmarxApiSession checkmarxApiSession, ProjectScannedDisplayData project)
+        private XDocument GenerateLastScanReport(ICheckmarxApiSession checkmarxApiSession, ProjectScannedDisplayData project)
         {
             long reportId;
-            XmlDocument xmlDocument;
+            XDocument xDocument;
             byte[] report;
 
             reportId = checkmarxApiSession.CreateScanReport(project.LastScanID, CxWSReportType.XML);
@@ -102,12 +95,11 @@ namespace CheckmarxReports
             }
 
             report = checkmarxApiSession.GetScanReport(reportId);
-            xmlDocument = new XmlDocument();
             using (MemoryStream memoryStream = new MemoryStream(report))
             {
                 try
                 {
-                    xmlDocument.Load(memoryStream);
+                    xDocument = XDocument.Load(memoryStream, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
                 }
                 catch (XmlException ex)
                 {
@@ -116,14 +108,14 @@ namespace CheckmarxReports
                 }
             }
 
-            return xmlDocument;
+            return xDocument;
         }
 
         /// <summary>
         /// Convert the Result <see cref="XmlNode"/> to a <see cref="ScanResult"/>.
         /// </summary>
         /// <param name="xmlNode">
-        /// The <see cref="XmlNode"/> associated with a result node.
+        /// The <see cref="XElement"/> associated with a result node.
         /// </param>
         /// <param name="projectName">
         /// The project name.
@@ -134,7 +126,7 @@ namespace CheckmarxReports
         /// <exception cref="CheckmarxErrorException">
         /// The XML returned by Checkmarx contains errors.
         /// </exception>
-        private ScanResult XmlNodeToScanResult(XmlNode xmlNode, string projectName)
+        private ScanResult XmlNodeToScanResult(XElement xmlNode, string projectName)
         {
             string ruleName;
             string severity;
@@ -144,19 +136,19 @@ namespace CheckmarxReports
             string status;
             bool falsePositive;
 
-            ruleName = xmlNode?.ParentNode?.Attributes["name"]?.Value ?? "(none)";
-            severity = xmlNode?.ParentNode?.Attributes["Severity"]?.Value ?? "(none)";
-            fileName = xmlNode?.Attributes["FileName"]?.Value ?? "(none)";
-            if (!uint.TryParse(xmlNode?.Attributes["Line"]?.Value ?? "0", out line))
+            ruleName = xmlNode?.Parent?.Attribute(XName.Get("name"))?.Value ?? "(none)";
+            severity = xmlNode?.Parent?.Attribute(XName.Get("Severity"))?.Value ?? "(none)";
+            fileName = xmlNode?.Attribute(XName.Get("FileName"))?.Value ?? "(none)";
+            if (!uint.TryParse(xmlNode?.Attribute(XName.Get("Line"))?.Value ?? "0", out line))
             {
                 throw new CheckmarxErrorException($"Line XML attribute for result in project {projectName} omitted or is not an integer");
             }
-            if (!Uri.TryCreate(xmlNode?.Attributes["DeepLink"]?.Value ?? "", UriKind.Absolute, out deepLink))
+            if (!Uri.TryCreate(xmlNode?.Attribute(XName.Get("DeepLink"))?.Value ?? "", UriKind.Absolute, out deepLink))
             {
                 throw new CheckmarxErrorException($"DeepLink XML attribute for result in project {projectName} omitted or is not a valid URL");
             }
-            status = xmlNode?.Attributes["Status"]?.Value ?? "(none)";
-            if (!bool.TryParse(xmlNode?.Attributes["FalsePositive"]?.Value ?? "", out falsePositive))
+            status = xmlNode?.Attribute(XName.Get("Status"))?.Value ?? "(none)";
+            if (!bool.TryParse(xmlNode?.Attribute(XName.Get("FalsePositive"))?.Value ?? "", out falsePositive))
             {
                 throw new CheckmarxErrorException($"FalsePositive XML attribute for result in project {projectName} omitted or is not a valid boolean");
             }
