@@ -16,7 +16,7 @@ namespace CheckmarxReports
         /// <summary>
         /// Output format. Optional.
         /// </summary>
-        [Option('f', "output-format", Required = false, Default = OutputFormat.Html, HelpText = "The output format, either HTML (default) or CSV.", MetaValue = "html | csv")]
+        [Option('f', "output-format", Required = false, Default = OutputFormat.Html, HelpText = "The output format, either Html (default) or Csv.", MetaValue = "Html | Csv")]
         public OutputFormat OutputFormat{ get; set; }
     }
 }
