@@ -16,6 +16,9 @@ namespace CheckmarxReports
     /// </summary>
     internal class Program
     {
+        private const int ExitSuccess = 0;
+        private const int ExitFailure = 1;
+
         /// <summary>
         /// Entry point.
         /// </summary>
@@ -42,18 +45,18 @@ namespace CheckmarxReports
                             // We can add other reports in the future using commands or a "--report REPORT" option.
                             RunNotFalsePositiveReport(options.Server, options.UserName, options.Password, output);
                         }
-                        return 0;
+                        return ExitSuccess;
                     }
                     catch (Exception ex)
                     {
                         Console.Error.WriteLine(ex.Message);
-                        return 1;
+                        return ExitFailure;
                     }
                 },
                 errors =>
                 {
                     Console.Error.WriteLine(errors.First());
-                    return 1;
+                    return ExitFailure;
                 });
         }
 
