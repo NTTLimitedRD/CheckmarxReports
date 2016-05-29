@@ -45,12 +45,6 @@ namespace CheckmarxReports
         /// <summary>
         /// Get the scans.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID returned from <see cref="CheckmarxApiSession.Login"/>. This cannot be null, empty or whitespace.
-        /// </param>
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>

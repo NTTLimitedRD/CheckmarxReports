@@ -40,7 +40,7 @@ namespace CheckmarxReports
                         using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
                         {
                             // We can add other reports in the future using commands or a "--report REPORT" option.
-                            RunNotFalsePositiveReport(options.HostName, options.UserName, options.Password, output);
+                            RunNotFalsePositiveReport(options.Server, options.UserName, options.Password, output);
                         }
                         return 0;
                     }

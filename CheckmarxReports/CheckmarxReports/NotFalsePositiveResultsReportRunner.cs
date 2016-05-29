@@ -125,7 +125,7 @@ namespace CheckmarxReports
         /// <param name="xmlNode">
         /// The <see cref="XmlNode"/> associated with a result node.
         /// </param>
-        /// <param name="project">
+        /// <param name="projectName">
         /// The project name.
         /// </param>
         /// <returns>

@@ -173,12 +173,6 @@ namespace CheckmarxReports
         /// <summary>
         /// Get the scans.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID returned from <see cref="Login"/>. This cannot be null, empty or whitespace.
-        /// </param>
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
@@ -284,7 +278,7 @@ namespace CheckmarxReports
             EndpointAddress endpointAddress;
 
             binding = new BasicHttpBinding(BasicHttpSecurityMode.Transport);
-            binding.MaxReceivedMessageSize = 4*1024*1024; // 4 MB
+            binding.MaxReceivedMessageSize = 1*1024*1024; // 1 MB
             endpointAddress = new EndpointAddress(sdkUrl);
 
             return new CxSDKWebServiceSoapClient(binding, endpointAddress);
@@ -336,15 +330,6 @@ namespace CheckmarxReports
         /// <summary>
         /// Logout the given session.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="CxSDKWebServiceSoapClient"/> to use. This cannot be null.
-        /// </param>
-        /// <param name="sessionId">
-        /// The session ID. This cannot be null, empty or whitespace.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// No argument can be null. <paramref name="sessionId"/> cannot be empty or whitespace.
-        /// </exception>
         /// <exception cref="CheckmarxErrorException">
         /// The Checkmarx API returned an unexpected error.
         /// </exception>
