@@ -1,7 +1,7 @@
 # Custom Checkmarx Report Runner
 
 [Checkmarx](http://checkmarx.com) is a [static analysis](https://www.owasp.org/index.php/Static_Code_Analysis) 
-or static application security testing (SAS) product. 
+or static application security testing (SAST) product. 
 
 Checkmarx's user interface is designed around creating one or more projects, representing different programs 
 being checked, and scan runs that show what security issues were discovered at that time. The usual workflow
