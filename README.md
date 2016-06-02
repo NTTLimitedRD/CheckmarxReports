@@ -25,10 +25,11 @@ or confirmed issues form the latest scan across all projects, filling that gap.
 
 ## Use
 
-To generate an HTML report, run the following from a command prompt:
+To generate an HTML report, run the following from a command prompt (wrapped for readability):
 
 ```
-checkmarxreports not-false-positives --server <server> --user-name <username> --password <password> --output-file report.html --output-format Html
+checkmarxreports not-false-positives --server <server> --user-name <username> --password <password>
+    --output-file report.html --output-format Html
 ```
 
 This creates a report in `report.html`. Note that this may take several minutes depending on the number 
