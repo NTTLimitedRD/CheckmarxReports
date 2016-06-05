@@ -1,7 +1,7 @@
 using System;
 using CheckmarxReports.CxSDKWebService;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Checkmarx
 {
     /// <summary>
     /// A Checkmarx API session.

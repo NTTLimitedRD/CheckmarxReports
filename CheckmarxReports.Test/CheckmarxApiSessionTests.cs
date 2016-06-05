@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Remoting.Channels;
+using CheckmarxReports.Checkmarx;
 using NUnit.Framework;
 
 namespace CheckmarxReports.Test

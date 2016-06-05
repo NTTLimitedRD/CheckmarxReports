@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel.Security;
 using System.Text;
+using CheckmarxReports.Checkmarx;
 using CheckmarxReports.CommandLineOptions;
 using CheckmarxReports.Credentials;
 using CommandLine;

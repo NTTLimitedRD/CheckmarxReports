@@ -62,12 +62,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckmarxApiSessionHelper.cs" />
+    <Compile Include="Checkmarx\CheckmarxApiSessionHelper.cs" />
     <Compile Include="CommandLineOptions\CheckmarxReportOptions.cs" />
-    <Compile Include="CheckmarxApiSession.cs" />
-    <Compile Include="CheckmarxCommunicationException.cs" />
-    <Compile Include="CheckmarxErrorException.cs" />
-    <Compile Include="CheckmarxException.cs" />
+    <Compile Include="Checkmarx\CheckmarxApiSession.cs" />
+    <Compile Include="Checkmarx\CheckmarxCommunicationException.cs" />
+    <Compile Include="Checkmarx\CheckmarxErrorException.cs" />
+    <Compile Include="Checkmarx\CheckmarxException.cs" />
     <Compile Include="CommandLineOptions\SaveCredentialsOptions.cs" />
     <Compile Include="Credentials\Algorithm.cs" />
     <Compile Include="Credentials\CredentialException.cs" />
@@ -78,7 +78,7 @@
     <Compile Include="Credentials\ICredentialRepository.cs" />
     <Compile Include="CsvScanResultFormatter.cs" />
     <Compile Include="CommandLineOptions\NotFalsePositiveReportOptions.cs" />
-    <Compile Include="ICheckmarxApiSession.cs" />
+    <Compile Include="Checkmarx\ICheckmarxApiSession.cs" />
     <Compile Include="IReportResultFormatter{TReportResult}.cs" />
     <Compile Include="IReportRunner{TReportResult}.cs" />
     <Compile Include="OutputFormat.cs" />

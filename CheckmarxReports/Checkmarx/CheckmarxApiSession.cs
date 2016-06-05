@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using CheckmarxReports.CxSDKWebService;
 using CheckmarxReports.CxWsResolver;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Checkmarx
 {
     /// <summary>
     /// Wrappers for the Checkmarx SDK web API methods.

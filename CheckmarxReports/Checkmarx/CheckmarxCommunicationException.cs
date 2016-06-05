@@ -1,38 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Checkmarx
 {
     /// <summary>
-    /// Base class for Checkmarx exceptions.
+    /// Thrown when an error occurs communicating with the Checkmarx server.
     /// </summary>
-    public abstract class CheckmarxException : Exception
+    public class CheckmarxCommunicationException: CheckmarxException
     {
         /// <summary>
-        /// Create a new <see cref="CheckmarxException"/>.
+        /// Create a new <see cref="CheckmarxErrorException"/>.
         /// </summary>
-        protected CheckmarxException()
+        public CheckmarxCommunicationException()
         {
             // Do nothing
         }
 
         /// <summary>
-        /// Create a new <see cref="CheckmarxException"/>.
+        /// Create a new <see cref="CheckmarxErrorException"/>.
         /// </summary>
         /// <param name="message">
         /// A human-readable error message.
         /// </param>
-        protected CheckmarxException(string message)
+        public CheckmarxCommunicationException(string message)
             : base(message)
         {
             // Do nothing
         }
 
         /// <summary>
-        /// Create a new <see cref="CheckmarxException"/>.
+        /// Create a new <see cref="CheckmarxErrorException"/>.
         /// </summary>
         /// <param name="message">
         /// A human-readable error message.
@@ -40,7 +36,7 @@ namespace CheckmarxReports
         /// <param name="inner">
         /// The inner or causing <see cref="Exception"/>.
         /// </param>
-        protected CheckmarxException(string message, Exception inner)
+        public CheckmarxCommunicationException(string message, Exception inner)
             : base(message, inner)
         {
             // Do nothing
