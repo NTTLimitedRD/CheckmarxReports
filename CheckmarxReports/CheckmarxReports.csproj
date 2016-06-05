@@ -69,6 +69,7 @@
     <Compile Include="CheckmarxErrorException.cs" />
     <Compile Include="CheckmarxException.cs" />
     <Compile Include="CommandLineOptions\SaveCredentialsOptions.cs" />
+    <Compile Include="Credentials\Algorithm.cs" />
     <Compile Include="Credentials\EncryptedCredential.cs" />
     <Compile Include="Credentials\CredentialNotFoundException.cs" />
     <Compile Include="Credentials\FileCredentialRepository.cs" />

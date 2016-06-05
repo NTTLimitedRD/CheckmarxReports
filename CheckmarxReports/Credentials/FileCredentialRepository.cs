@@ -301,6 +301,7 @@ namespace CheckmarxReports.Credentials
 
             return new EncryptedCredential
             {
+                Algorithm = Algorithm.Default,
                 UserNameIv = Convert.ToBase64String(userNameIv),
                 PasswordIv = Convert.ToBase64String(passwordIv),
                 UserName = Convert.ToBase64String(

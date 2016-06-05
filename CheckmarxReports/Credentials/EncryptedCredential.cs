@@ -13,6 +13,12 @@ namespace CheckmarxReports.Credentials
     public class EncryptedCredential
     {
         /// <summary>
+        /// The algorithm (used for cryptographic agility).
+        /// </summary>
+        [JilDirective(Name = "algorithm")]
+        public Algorithm Algorithm { get; set; }
+
+        /// <summary>
         /// The user name.
         /// </summary>
         [JilDirective(Name = "userName")]
