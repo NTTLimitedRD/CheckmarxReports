@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CheckmarxReports.Checkmarx;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Reports
 {
     /// <summary>
     /// Return the raw XML from scan results. This is useful for debugging.

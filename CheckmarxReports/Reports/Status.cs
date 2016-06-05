@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CheckmarxReports
+﻿namespace CheckmarxReports.Reports
 {
     /// <summary>
     /// Whether the result has been seen previously.

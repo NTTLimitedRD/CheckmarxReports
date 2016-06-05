@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using CheckmarxReports.Checkmarx;
-using CheckmarxReports.CxSDKWebService;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Reports
 {
     /// <summary>
     /// Get a list of non false positives from the server.

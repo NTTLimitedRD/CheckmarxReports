@@ -76,20 +76,20 @@
     <Compile Include="Credentials\CredentialNotFoundException.cs" />
     <Compile Include="Credentials\FileCredentialRepository.cs" />
     <Compile Include="Credentials\ICredentialRepository.cs" />
-    <Compile Include="CsvScanResultFormatter.cs" />
+    <Compile Include="Reports\CsvScanResultFormatter.cs" />
     <Compile Include="CommandLineOptions\NotFalsePositiveReportOptions.cs" />
     <Compile Include="Checkmarx\ICheckmarxApiSession.cs" />
-    <Compile Include="IReportResultFormatter{TReportResult}.cs" />
-    <Compile Include="IReportRunner{TReportResult}.cs" />
-    <Compile Include="OutputFormat.cs" />
+    <Compile Include="Reports\IReportResultFormatter{TReportResult}.cs" />
+    <Compile Include="Reports\IReportRunner{TReportResult}.cs" />
+    <Compile Include="Reports\OutputFormat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NotFalsePositiveResultsReportRunner.cs" />
+    <Compile Include="Reports\NotFalsePositiveResultsReportRunner.cs" />
     <Compile Include="CommandLineOptions\RawScanResultXmlOptions.cs" />
-    <Compile Include="HtmlScanResultFormatter.cs" />
-    <Compile Include="RawScanXmlReportRunner.cs" />
-    <Compile Include="Severity.cs" />
-    <Compile Include="ScanResult.cs" />
+    <Compile Include="Reports\HtmlScanResultFormatter.cs" />
+    <Compile Include="Reports\RawScanXmlReportRunner.cs" />
+    <Compile Include="Reports\Severity.cs" />
+    <Compile Include="Reports\ScanResult.cs" />
     <Compile Include="Service References\CxSDKWebService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -100,8 +100,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Status.cs" />
-    <Compile Include="TextStringFormatter.cs" />
+    <Compile Include="Reports\Status.cs" />
+    <Compile Include="Reports\TextStringFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

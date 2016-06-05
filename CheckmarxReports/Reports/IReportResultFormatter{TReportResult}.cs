@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Reports
 {
     /// <summary>
     /// Convert the report results to something human readable.

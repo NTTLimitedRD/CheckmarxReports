@@ -1,9 +1,7 @@
-﻿using System;
-using System.Runtime.Remoting.Channels;
-using CheckmarxReports.Checkmarx;
+﻿using CheckmarxReports.Checkmarx;
 using NUnit.Framework;
 
-namespace CheckmarxReports.Test
+namespace CheckmarxReports.Test.Checkmarx
 {
     [TestFixture]
     public class CheckmarxApiSessionTests

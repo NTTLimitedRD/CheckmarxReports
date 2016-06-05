@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CheckmarxReports.Reports;
 using NUnit.Framework;
 
-namespace CheckmarxReports.Test
+namespace CheckmarxReports.Test.Reports
 {
 	[TestFixture]
     public class NotFalsePositiveResultsReportRunnerTests

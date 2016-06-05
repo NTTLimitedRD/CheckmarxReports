@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.UI;
-using CheckmarxReports.CxSDKWebService;
 
-namespace CheckmarxReports
+namespace CheckmarxReports.Reports
 {
     /// <summary>
     /// Convert the report results from a list of <see cref="ScanResult"/> human readable results 

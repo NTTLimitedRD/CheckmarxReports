@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using CheckmarxReports.Reports;
+using CommandLine;
 
 namespace CheckmarxReports.CommandLineOptions
 {

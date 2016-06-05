@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.ServiceModel.Security;
 using System.Text;
 using CheckmarxReports.Checkmarx;
 using CheckmarxReports.CommandLineOptions;
 using CheckmarxReports.Credentials;
+using CheckmarxReports.Reports;
 using CommandLine;
 
 namespace CheckmarxReports
@@ -154,7 +154,8 @@ namespace CheckmarxReports
         /// The process return value.
         /// </returns>
         /// <exception cref="ArgumentException">
-        /// <paramref name="server"/> and <paramref name="userName"/> cannot be null, empty or whitespace.
+        /// <paramref name="server"/>,  <paramref name="userName"/> and <paramref name="password"/> cannot 
+        /// be null, empty or whitespace.
         /// </exception>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="credentialRepository"/> cannot be null.
@@ -218,7 +219,7 @@ namespace CheckmarxReports
         /// A <see cref="ICredentialRepository"/> to load saved credentials from.
         /// </param>
         /// <param name="server">
-        /// The server name.
+        /// The server name. This cannot be null, empty or whitespace.
         /// </param>
         /// <param name="suppliedUserName">
         /// The user name given on the command line. Use the stored one if null.
@@ -232,11 +233,17 @@ namespace CheckmarxReports
         /// <param name="password">
         /// Received the password.
         /// </param>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="server"/> cannot be null, empty or whitespace.
+        /// </exception>
+        /// <exception cref="CredentialNotFoundException">
+        /// No credentials are specified or saved for that server.
+        /// </exception>
         private static void GetCredentials(ICredentialRepository credentialRepository, 
             string server, string suppliedUserName, string suppliedPassword,
             out string userName, out string password)
         {
-            if (suppliedUserName == null || suppliedPassword == null)
+            if (string.IsNullOrWhiteSpace(suppliedUserName) || string.IsNullOrWhiteSpace(suppliedPassword))
             {
                 credentialRepository.Load(server, out userName, out password);
             }
