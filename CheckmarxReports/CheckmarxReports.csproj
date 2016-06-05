@@ -54,11 +54,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CheckmarxApiSessionHelper.cs" />
+    <Compile Include="CommandLineOptions\BaseOptions.cs" />
     <Compile Include="CommandLineOptions\CheckmarxReportOptions.cs" />
     <Compile Include="CheckmarxApiSession.cs" />
     <Compile Include="CheckmarxCommunicationException.cs" />
     <Compile Include="CheckmarxErrorException.cs" />
     <Compile Include="CheckmarxException.cs" />
+    <Compile Include="CommandLineOptions\SaveCredentialsOptions.cs" />
+    <Compile Include="Credentials\CredentialNotFoundException.cs" />
+    <Compile Include="Credentials\FileCredentialRepository.cs" />
+    <Compile Include="Credentials\ICredentialRepository.cs" />
     <Compile Include="CsvScanResultFormatter.cs" />
     <Compile Include="CommandLineOptions\NotFalsePositiveReportOptions.cs" />
     <Compile Include="ICheckmarxApiSession.cs" />

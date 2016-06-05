@@ -43,6 +43,10 @@ namespace CheckmarxReports
                             result = RunReport(new RawScanXmlReportRunner(), new TextStringFormatter(), 
                                 options.Server, options.UserName, options.Password, options.OutputPath);
                         })
+                    .WithParsed<SaveCredentialsOptions>(options =>
+                        {
+                            result = SaveCredentials(options.Server, options.UserName, options.Password);
+                        })
                     .WithNotParsed(
                         errors =>
                         {
@@ -115,6 +119,36 @@ namespace CheckmarxReports
             {
                 reportResultFormatter.Format(reportRunner.Run(checkmarxApiSession), output, server, userName);
             }
+
+            return ExitSuccess;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        private static int SaveCredentials(string server, string userName, string password)
+        {
+            if (string.IsNullOrWhiteSpace(server))
+            {
+                throw new ArgumentException("Argument is null or whitespace", nameof(server));
+            }
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                throw new ArgumentException("Argument is null or whitespace", nameof(userName));
+            }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("Argument is null or whitespace", nameof(password));
+            }
+
+            // Get file
+
+
+            // Save credentials
 
             return ExitSuccess;
         }
