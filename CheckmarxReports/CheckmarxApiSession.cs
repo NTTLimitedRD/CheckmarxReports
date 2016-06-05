@@ -316,9 +316,9 @@ namespace CheckmarxReports
                 throw new ArgumentNullException(nameof(password));
             }
 
-            Credentials credentials;
+            CxSDKWebService.Credentials credentials;
 
-            credentials = new Credentials
+            credentials = new CxSDKWebService.Credentials
             {
                 User = username,
                 Pass = password
