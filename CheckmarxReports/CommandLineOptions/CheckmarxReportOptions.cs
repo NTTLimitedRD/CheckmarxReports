@@ -5,8 +5,26 @@ namespace CheckmarxReports.CommandLineOptions
     /// <summary>
     /// Base class for Checkmarx report commands.
     /// </summary>
-    public abstract class CheckmarxReportOptions: BaseOptions
+    public abstract class CheckmarxReportOptions
     {
+        /// <summary>
+        /// Server name.
+        /// </summary>
+        [Option('s', "server", Required = true, HelpText = "Checkmarx server name. Assumes https.", MetaValue = "SERVER")]
+        public string Server { get; set; }
+
+        /// <summary>
+        /// User name.
+        /// </summary>
+        [Option('u', "user-name", Required = false, HelpText = "User name. Uses previously saved credentials for this server if omitted.", MetaValue = "USER_NAME")]
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// Password.
+        /// </summary>
+        [Option('p', "password", Required = false, HelpText = "Password. Uses previously saved credentials for this server if omitted.", MetaValue = "PASSWORD")]
+        public string Password { get; set; }
+
         /// <summary>
         /// Output path. Optional.
         /// </summary>

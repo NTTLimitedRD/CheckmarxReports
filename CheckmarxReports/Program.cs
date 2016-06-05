@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ServiceModel.Security;
 using System.Text;
 using CheckmarxReports.CommandLineOptions;
+using CheckmarxReports.Credentials;
 using CommandLine;
 
 namespace CheckmarxReports
@@ -28,24 +30,25 @@ namespace CheckmarxReports
         private static int Main(string[] args)
         {
             int result = ExitFailure;
+            ICredentialRepository credentialRepository = new FileCredentialRepository();
 
             try
             {
                 Parser.Default
-                    .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions>(args)
+                    .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions, SaveCredentialsOptions>(args)
                     .WithParsed<NotFalsePositiveReportOptions>(options =>
                         {
-                            result = RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options), 
-                                options.Server, options.UserName, options.Password, options.OutputPath);
+                            result = RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options),
+                                credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
                         })
                     .WithParsed<RawScanResultXmlOptions>(options =>
                         {
-                            result = RunReport(new RawScanXmlReportRunner(), new TextStringFormatter(), 
-                                options.Server, options.UserName, options.Password, options.OutputPath);
+                            result = RunReport(new RawScanXmlReportRunner(), new TextStringFormatter(),
+                                credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
                         })
                     .WithParsed<SaveCredentialsOptions>(options =>
                         {
-                            result = SaveCredentials(options.Server, options.UserName, options.Password);
+                            result = SaveCredentials(credentialRepository, options.Server, options.UserName, options.Password);
                         })
                     .WithNotParsed(
                         errors =>
@@ -70,26 +73,33 @@ namespace CheckmarxReports
         /// <param name="reportResultFormatter">
         /// A <see cref="IReportResultFormatter{TReportResult}"/> to format the report results. This cannot be null.
         /// </param>
+        /// <param name="credentialRepository">
+        /// Used to load previously saved credentials. Cannot be null.
+        /// </param>
         /// <param name="server">
         /// The Checkmarx server name. Cannot be null, empty or whitespace.
         /// </param>
-        /// <param name="userName">
-        /// The username to login with. Cannot be null, empty or whitespace.
+        /// <param name="suppliedUserName">
+        /// The username to login with. Use the loaded value if null.
         /// </param>
-        /// <param name="password">
-        /// The password to login with. Cannot be null.
+        /// <param name="suppliedPassword">
+        /// The password to login with. Use the loaded value if null.
         /// </param>
         /// <param name="outputPath">
         /// An optional file to write the output to.
         /// </param>
+        /// <returns>
+        /// The process return value.
+        /// </returns>
         /// <exception cref="ArgumentException">
-        /// <paramref name="server"/> and <paramref name="userName"/> cannot be null, empty or whitespace.
+        /// <paramref name="server"/> and <paramref name="suppliedUserName"/> cannot be null, empty or whitespace.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="reportRunner"/>, <paramref name="reportResultFormatter"/> and <paramref name="password"/> and  cannot be null.
+        /// <paramref name="reportRunner"/>, <paramref name="reportResultFormatter"/> and <paramref name="credentialRepository"/> 
+        /// and  cannot be null.
         /// </exception>
         private static int RunReport<TReportResult>(IReportRunner<TReportResult> reportRunner, IReportResultFormatter<TReportResult> reportResultFormatter, 
-            string server, string userName, string password, string outputPath)
+            ICredentialRepository credentialRepository, string server, string suppliedUserName, string suppliedPassword, string outputPath)
         {
             if (reportRunner == null)
             {
@@ -99,18 +109,19 @@ namespace CheckmarxReports
             {
                 throw new ArgumentNullException(nameof(reportResultFormatter));
             }
+            if (credentialRepository == null)
+            {
+                throw new ArgumentNullException(nameof(credentialRepository));
+            }
             if (string.IsNullOrWhiteSpace(server))
             {
                 throw new ArgumentException("Cannot be null, empty or whitespace", nameof(server));
             }
-            if (string.IsNullOrWhiteSpace(userName))
-            {
-                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(userName));
-            }
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password));
-            }
+
+            string userName;
+            string password;
+
+            GetCredentials(credentialRepository, server, suppliedUserName, suppliedPassword, out userName, out password);
 
             using (Stream stream = string.IsNullOrWhiteSpace(outputPath)
                 ? Console.OpenStandardOutput() : new FileStream(outputPath, FileMode.Create))
@@ -124,14 +135,32 @@ namespace CheckmarxReports
         }
 
         /// <summary>
-        /// 
+        /// Save user credentials.
         /// </summary>
-        /// <param name="server"></param>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        private static int SaveCredentials(string server, string userName, string password)
+        /// <param name="server">
+        /// The Checkmarx server name. Cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="userName">
+        /// The username to login with. Cannot be null, empty or whitespace.
+        /// </param>
+        /// <param name="password">
+        /// The password to login with. Cannot be null.
+        /// </param>
+        /// <returns>
+        /// The process return value.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="server"/> and <paramref name="userName"/> cannot be null, empty or whitespace.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="credentialRepository"/> cannot be null.
+        /// </exception>
+        private static int SaveCredentials(ICredentialRepository credentialRepository, string server, string userName, string password)
         {
+            if (credentialRepository == null)
+            {
+                throw new ArgumentNullException(nameof(credentialRepository));
+            }
             if (string.IsNullOrWhiteSpace(server))
             {
                 throw new ArgumentException("Argument is null or whitespace", nameof(server));
@@ -144,11 +173,8 @@ namespace CheckmarxReports
             {
                 throw new ArgumentException("Argument is null or whitespace", nameof(password));
             }
-
-            // Get file
-
-
-            // Save credentials
+            
+            credentialRepository.Save(server, userName, password);
 
             return ExitSuccess;
         }
@@ -179,6 +205,42 @@ namespace CheckmarxReports
             }
 
             return reportResultFormatter;
+        }
+
+        /// <summary>
+        /// Use saved credentials if omitted.
+        /// </summary>
+        /// <param name="credentialRepository">
+        /// A <see cref="ICredentialRepository"/> to load saved credentials from.
+        /// </param>
+        /// <param name="server">
+        /// The server name.
+        /// </param>
+        /// <param name="suppliedUserName">
+        /// The user name given on the command line. Use the stored one if null.
+        /// </param>
+        /// <param name="suppliedPassword">
+        /// The password given on the command line. Use the stored one if null.
+        /// </param>
+        /// <param name="userName">
+        /// Receives the user name.
+        /// </param>
+        /// <param name="password">
+        /// Received the password.
+        /// </param>
+        private static void GetCredentials(ICredentialRepository credentialRepository, 
+            string server, string suppliedUserName, string suppliedPassword,
+            out string userName, out string password)
+        {
+            if (suppliedUserName == null || suppliedPassword == null)
+            {
+                credentialRepository.Load(server, out userName, out password);
+            }
+            else
+            {
+                userName = suppliedUserName;
+                password = suppliedPassword;
+            }
         }
     }
 }

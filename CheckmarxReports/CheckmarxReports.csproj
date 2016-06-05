@@ -63,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CheckmarxApiSessionHelper.cs" />
-    <Compile Include="CommandLineOptions\BaseOptions.cs" />
     <Compile Include="CommandLineOptions\CheckmarxReportOptions.cs" />
     <Compile Include="CheckmarxApiSession.cs" />
     <Compile Include="CheckmarxCommunicationException.cs" />
