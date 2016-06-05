@@ -14,8 +14,23 @@ namespace CheckmarxReports.Credentials
     /// <summary>
     /// Save or load credentials to a configuration file.
     /// </summary>
+    /// <remarks>
+    /// Credentials are encrypted using the Windows Data Protection API. Each
+    /// user name and password has a unique IV generated when the credential is
+    /// saved.
+    /// </remarks>
     public class FileCredentialRepository : ICredentialRepository
     {
+        /// <summary>
+        /// Create a new <see cref="FileCredentialRepository"/> using
+        /// the default configuration file.
+        /// </summary>
+        public FileCredentialRepository()
+            : this(GetDefaultFilePath())
+        {
+            // Do nothing    
+        }
+
         /// <summary>
         /// Create a new <see cref="FileCredentialRepository"/>.
         /// </summary>
@@ -31,12 +46,29 @@ namespace CheckmarxReports.Credentials
             }
 
             FilePath = filePath;
+            Scope = DataProtectionScope.CurrentUser;
         }
 
         /// <summary>
         /// The configuration file path.
         /// </summary>
-        public string FilePath { get; set; }
+        public string FilePath { get; }
+
+        /// <summary>
+        /// The scope for encryption keys.
+        /// </summary>
+        public DataProtectionScope Scope { get; }
+
+        /// <summary>
+        /// Default config file.
+        /// </summary>
+        /// <returns>
+        /// The default file for storing credentials.
+        /// </returns>
+        public static string GetDefaultFilePath()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "credentials.json");
+        }
 
         /// <summary>
         /// Save the credentials. Existing credentials, if any, are overwritten.
@@ -125,10 +157,6 @@ namespace CheckmarxReports.Credentials
             {
                 throw new CredentialNotFoundException(server);
             }
-
-            // Avoid warning
-            userName = null;
-            password = null;
         }
 
         /// <summary>
@@ -153,10 +181,21 @@ namespace CheckmarxReports.Credentials
                 throw new ArgumentException("Cannot be null, empty or whitespace", nameof(filePath));
             }
 
-            using (StreamReader streamReader = new StreamReader(filePath, Encoding.UTF8))
+            Dictionary<string, EncryptedCredential> result;
+
+            try
             {
-                return JSON.Deserialize<Dictionary<string, EncryptedCredential>>(streamReader);
+                using (StreamReader streamReader = new StreamReader(filePath, Encoding.UTF8))
+                {
+                    result = JSON.Deserialize<Dictionary<string, EncryptedCredential>>(streamReader);
+                }
             }
+            catch (FileNotFoundException)
+            {
+                result = new Dictionary<string, EncryptedCredential>();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -212,12 +251,12 @@ namespace CheckmarxReports.Credentials
 
             userNamePlainText = ProtectedData.Unprotect(
                 Convert.FromBase64String(credential.UserName), 
-                Convert.FromBase64String(credential.UserNameIv), 
-                DataProtectionScope.CurrentUser);
+                Convert.FromBase64String(credential.UserNameIv),
+                Scope);
             passwordPlainText = ProtectedData.Unprotect(
                 Convert.FromBase64String(credential.Password), 
-                Convert.FromBase64String(credential.PasswordIv), 
-                DataProtectionScope.CurrentUser);
+                Convert.FromBase64String(credential.PasswordIv),
+                Scope);
 
             userName = new string(Encoding.UTF8.GetChars(userNamePlainText));
             password = new string(Encoding.UTF8.GetChars(passwordPlainText));
@@ -268,12 +307,12 @@ namespace CheckmarxReports.Credentials
                     ProtectedData.Protect(
                         Encoding.UTF8.GetBytes(userName),
                         userNameIv,
-                        DataProtectionScope.CurrentUser)),
+                        Scope)),
                 Password = Convert.ToBase64String(
                     ProtectedData.Protect(
                         Encoding.UTF8.GetBytes(password),
                         passwordIv,
-                        DataProtectionScope.CurrentUser))
+                        Scope))
             };
         }
     }
