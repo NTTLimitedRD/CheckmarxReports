@@ -137,6 +137,9 @@ namespace CheckmarxReports
         /// <summary>
         /// Save user credentials.
         /// </summary>
+        /// <param name="credentialRepository">
+        /// The <see cref="ICredentialRepository"/> to save credentials to.
+        /// </param>
         /// <param name="server">
         /// The Checkmarx server name. Cannot be null, empty or whitespace.
         /// </param>

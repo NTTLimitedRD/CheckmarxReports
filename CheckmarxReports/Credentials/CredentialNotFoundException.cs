@@ -9,7 +9,7 @@ namespace CheckmarxReports.Credentials
     /// <summary>
     /// No credentials were stored for the specified server.
     /// </summary>
-    public class CredentialNotFoundException: Exception
+    public class CredentialNotFoundException: CredentialException
     {
         /// <summary>
         /// Create a new <see cref="CredentialNotFoundException"/> saying credentials

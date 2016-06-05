@@ -194,6 +194,10 @@ namespace CheckmarxReports.Credentials
             {
                 result = new Dictionary<string, EncryptedCredential>();
             }
+            catch (DeserializationException ex)
+            {
+                throw new CredentialSerializationException($"Error loading credentails: {ex.Message}", ex);
+            }
 
             return result;
         }
@@ -214,9 +218,16 @@ namespace CheckmarxReports.Credentials
                 throw new ArgumentException("Cannot be null, empty or whitespace", nameof(filePath));
             }
 
-            using (StreamWriter streamWriter = new StreamWriter(filePath, false, Encoding.UTF8))
+            try
             {
-                JSON.Serialize(credentials, streamWriter);
+                using (StreamWriter streamWriter = new StreamWriter(filePath, false, Encoding.UTF8))
+                {
+                    JSON.Serialize(credentials, streamWriter);
+                }
+            }
+            catch (SerializerException ex)
+            {
+                throw new CredentialSerializationException($"Error saving credentails: {ex.Message}", ex);
             }
         }
 
