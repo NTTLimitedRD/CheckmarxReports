@@ -112,6 +112,7 @@ namespace CheckmarxReports.Credentials
         /// <exception cref="CredentialNotFoundException">
         /// No credentials are stored for that server.
         /// </exception>
+        /// <seealso cref="Contains"/>
         public void Load(string server, out string userName, out string password)
         {
             EncryptedCredential credential;
@@ -119,6 +120,10 @@ namespace CheckmarxReports.Credentials
             if (LoadCredentials(FilePath).TryGetValue(server, out credential))
             {
                 Decrypt(credential, out userName, out password);
+            }
+            else
+            {
+                throw new CredentialNotFoundException(server);
             }
 
             // Avoid warning
