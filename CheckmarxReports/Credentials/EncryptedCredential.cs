@@ -31,7 +31,7 @@ namespace CheckmarxReports.Credentials
         public string UserNameIv { get; set; }
 
         /// <summary>
-        /// The user name initialization vector (IV).
+        /// The password initialization vector (IV).
         /// </summary>
         [JilDirective(Name = "passwordIV")]
         public string PasswordIv { get; set; }
@@ -43,19 +43,19 @@ namespace CheckmarxReports.Credentials
         {
             if (string.IsNullOrWhiteSpace(UserName))
             {
-                throw new ArgumentException("UserName cannot be null, empty or whitespace");
+                throw new ArgumentException("UserName cannot be null, empty or whitespace", nameof(UserName));
             }
             if (string.IsNullOrWhiteSpace(UserNameIv))
             {
-                throw new ArgumentException("UserNameIV cannot be null, empty or whitespace");
+                throw new ArgumentException("UserNameIV cannot be null, empty or whitespace", nameof(UserNameIv));
             }
             if (string.IsNullOrWhiteSpace(Password))
             {
-                throw new ArgumentException("Password cannot be null, empty or whitespace");
+                throw new ArgumentException("Password cannot be null, empty or whitespace", nameof(Password));
             }
             if (string.IsNullOrWhiteSpace(PasswordIv))
             {
-                throw new ArgumentException("PasswordIv cannot be null, empty or whitespace");
+                throw new ArgumentException("PasswordIv cannot be null, empty or whitespace", nameof(PasswordIv));
             }
         }
     }
