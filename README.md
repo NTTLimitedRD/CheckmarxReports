@@ -1,5 +1,10 @@
 # Custom Checkmarx Report Runner
 
+A command line report generator for [Checkmarx](http://checkmarx.com) that supplies missing reports 
+useful for a centralized security team.
+
+## Background
+
 [Checkmarx](http://checkmarx.com) is a [static analysis](https://www.owasp.org/index.php/Static_Code_Analysis) 
 or static application security testing (SAST) product. 
 
@@ -38,6 +43,17 @@ and size of projects and who busy the Checkmarx server is.
 To generate a CSV file instead, change `--output-format Html` to `--output-format Csv`. This can be useful to futher manipulate 
 or format the data differently.
 
+To avoid entering credentials repeatedly, use:
+
+```
+checkmarxreports save --server <server> --user-name <username> --password <password>
+```
+
+This saves the credentials for that server encrypted to a file in "%userprofile%\Application Data\Local" 
+for later reuse. The credentials are encrypted using the Windows data protection API.
+
+Details of other reports and help is available on the command line using `checkmarxreports help`.
+
 ## Limitations
 
 Note:
@@ -51,8 +67,8 @@ Note:
 
 Note:
 
- 1. The code uses the [Checkmarx SOAP API](https://checkmarx.atlassian.net/wiki/display/KC/SOAP+API) to access Checkmarx data. 
- 1. The code runs reports in parallel, up to 3 at a time.
+ 1. The code uses the [Checkmarx SOAP API](https://checkmarx.atlassian.net/wiki/display/KC/SOAP+API) to access Checkmarx data. It includes a partial .Net wrapper that other projects may find useful.
+ 1. The code runs reports in parallel, up to 3 at a time. If the reports are large, this may stress the Checkmarx server. This setting is not exposed externally but is easy to do. Raise an issue/request if needed.
  1. The code requires C# 6.0 as it uses interpolated strings and the `nameof` keyword. It has only been run in Visual Studio 2015 running on Windows 10 and Windows 2012 R2.
  1. There are limited automated tests.
 
