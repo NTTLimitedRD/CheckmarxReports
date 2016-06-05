@@ -19,7 +19,7 @@ namespace CheckmarxReports.Credentials
         /// The server to 
         /// </param>
         public CredentialNotFoundException(string server)
-            : base($"Credentials not found for server {server ?? "(null)"}")
+            : base($"Credentials not found for server '{server ?? "(null)"}'")
         {
             // Do nothing
         }
