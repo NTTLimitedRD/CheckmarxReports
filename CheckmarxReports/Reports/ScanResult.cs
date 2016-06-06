@@ -5,7 +5,7 @@ namespace CheckmarxReports.Reports
     /// <summary>
     /// The result of the scan.
     /// </summary>
-    public class ScanResult
+    public class ScanResult : IEquatable<ScanResult>
     {
         /// <summary>
         /// Create a <see cref="ScanResult"/>.
@@ -108,5 +108,50 @@ namespace CheckmarxReports.Reports
         /// True if a Checkmarx user has marked this as "Not Vulnerable", false otherwise.
         /// </summary>
         public bool FalsePositive { get; private set; }
+
+        /// <summary>
+        /// Equality
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(ScanResult other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(ProjectName, other.ProjectName) && string.Equals(RuleName, other.RuleName) && Severity == other.Severity && string.Equals(FilePath, other.FilePath) && Line == other.Line && Equals(DeepLink, other.DeepLink) && Status == other.Status && FalsePositive == other.FalsePositive;
+        }
+
+        /// <summary>
+        /// Equality
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ScanResult) obj);
+        }
+
+        /// <summary>
+        /// Get hash code.
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (ProjectName != null ? ProjectName.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (RuleName != null ? RuleName.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (int) Severity;
+                hashCode = (hashCode*397) ^ (FilePath != null ? FilePath.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (int) Line;
+                hashCode = (hashCode*397) ^ (DeepLink != null ? DeepLink.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (int) Status;
+                hashCode = (hashCode*397) ^ FalsePositive.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }
