@@ -222,7 +222,7 @@ namespace CheckmarxReports.Credentials
             {
                 using (StreamWriter streamWriter = new StreamWriter(filePath, false, Encoding.UTF8))
                 {
-                    JSON.Serialize(credentials, streamWriter);
+                    JSON.Serialize(credentials, streamWriter, Options.PrettyPrint);
                 }
             }
             catch (SerializerException ex)
