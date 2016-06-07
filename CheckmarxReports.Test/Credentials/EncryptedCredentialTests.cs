@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,8 @@ namespace CheckmarxReports.Test.Credentials
             {
                 Assert.That(
                     () => encryptedCredential.AssertValid(),
-                    Throws.ArgumentException.And.Property("ParamName").EqualTo(expectedInvalidArgument));
+                    Throws.TypeOf<ValidationException>()
+                          .And.Property("ValidationResult").Property("MemberNames").EquivalentTo(new [] { expectedInvalidArgument} ));
             }
         }
     }
