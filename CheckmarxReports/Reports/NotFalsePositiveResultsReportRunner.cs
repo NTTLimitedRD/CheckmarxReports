@@ -48,7 +48,7 @@ namespace CheckmarxReports.Reports
                     .WithDegreeOfParallelism(MaxParallelization)
                     .SelectMany(
                         project =>
-                            CheckmarxApiSessionHelper.GenerateLastScanReport(checkmarxApiSession, project)
+                            CheckmarxApiSessionHelper.GenerateLastScanXmlReport(checkmarxApiSession, project)
                                 .XPathSelectElements("//Result[@FalsePositive=\"False\"]")
                                 .Select(xmlNode => XmlNodeToScanResult(xmlNode, project.ProjectName)))
                     .ToList();

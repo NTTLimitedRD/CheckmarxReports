@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using CheckmarxReports.Checkmarx;
+using CheckmarxReports.CxSDKWebService;
 
 namespace CheckmarxReports.Reports
 {
     /// <summary>
-    /// Return the raw XML from scan results. This is useful for debugging.
+    /// Return the raw CSV from scan results. This is useful for debugging.
     /// </summary>
-    public class RawScanXmlReportRunner: IReportRunner<string>
+    public class RawScanCsvReportRunner: IReportRunner<string>
     {
         /// <summary>
         /// Max simultaneous report runs.
@@ -45,7 +46,7 @@ namespace CheckmarxReports.Reports
                     .WithDegreeOfParallelism(MaxParallelization)
                     .Select(
                         project =>
-                            CheckmarxApiSessionHelper.GenerateLastScanXmlReport(checkmarxApiSession, project).ToString())
+                            CheckmarxApiSessionHelper.GenerateLastScanCsvReport(checkmarxApiSession, project).ToString())
                     .ToList();
         }
     }

@@ -69,6 +69,7 @@
     <Compile Include="Checkmarx\CheckmarxCommunicationException.cs" />
     <Compile Include="Checkmarx\CheckmarxErrorException.cs" />
     <Compile Include="Checkmarx\CheckmarxException.cs" />
+    <Compile Include="CommandLineOptions\RawScanResultCsvOptions.cs" />
     <Compile Include="CommandLineOptions\SaveCredentialsOptions.cs" />
     <Compile Include="Credentials\Algorithm.cs" />
     <Compile Include="Credentials\CredentialException.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Reports\NotFalsePositiveResultsReportRunner.cs" />
     <Compile Include="CommandLineOptions\RawScanResultXmlOptions.cs" />
     <Compile Include="Reports\HtmlScanResultFormatter.cs" />
+    <Compile Include="Reports\RawScanCsvReportRunner.cs" />
     <Compile Include="Reports\RawScanXmlReportRunner.cs" />
     <Compile Include="Reports\Severity.cs" />
     <Compile Include="Reports\ScanResult.cs" />

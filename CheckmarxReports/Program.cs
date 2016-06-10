@@ -36,7 +36,7 @@ namespace CheckmarxReports
             try
             {
                 Parser.Default
-                    .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions, SaveCredentialsOptions>(args)
+                    .ParseArguments<NotFalsePositiveReportOptions, RawScanResultXmlOptions, SaveCredentialsOptions, RawScanResultCsvOptions>(args)
                     .WithParsed<NotFalsePositiveReportOptions>(options =>
                         {
                             result = RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options),
@@ -47,6 +47,11 @@ namespace CheckmarxReports
                             result = RunReport(new RawScanXmlReportRunner(), new TextStringFormatter(),
                                 credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
                         })
+                    .WithParsed<RawScanResultCsvOptions>(options =>
+                    {
+                        result = RunReport(new RawScanCsvReportRunner(), new TextStringFormatter(),
+                            credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
+                    })
                     .WithParsed<SaveCredentialsOptions>(options =>
                         {
                             result = SaveCredentials(credentialRepository, options.Server, options.UserName, options.Password);
