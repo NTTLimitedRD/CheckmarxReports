@@ -9,7 +9,7 @@ useful for a centralized security team.
 or static application security testing (SAST) product. 
 
 Checkmarx's user interface is designed around creating one or more projects, representing different programs 
-being checked, and scan runs that show what security issues were discovered at that time. The usual workflow
+being checked, and running scans to discover security issues. The usual workflow
 is:
 
 1. Checkmarx runs a scan on a project and identifies issues.
