@@ -38,7 +38,7 @@ checkmarxreports not-false-positives --server <server> --user-name <username> --
 ```
 
 This creates a report in `report.html`. Note that this may take several minutes depending on the number 
-and size of projects and who busy the Checkmarx server is.
+and size of projects and how busy the Checkmarx server is.
 
 To generate a CSV file instead, change `--output-format Html` to `--output-format Csv`. This can be useful to futher manipulate 
 or format the data differently.
@@ -59,7 +59,7 @@ Details of other reports and help is available on the command line using `checkm
 Note:
 
  1. There is limited control over the report generated. This tool is not meant to provide a broad reporting solution, merely a quick way to get data out of Checkmarx that the UI does not provide. Use the CSV output to get data easily manipulated, such as in a spreadsheet.
- 1. The application assumes the Checkmarx server is accessible via HTTPS. After all, we are all security professionals and avoid using HTTP, dont' we?
+ 1. The application assumes the Checkmarx server is accessible via HTTPS. After all, we are all security professionals and avoid using HTTP, don't we?
  1. While the architecture supports multiple reports, only one report ("not false positives") is included at this time.
  1. It has only been tested against Checkmarx v8.0. 
 
