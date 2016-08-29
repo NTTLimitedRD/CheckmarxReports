@@ -16,6 +16,10 @@
         /// <summary>
         /// Low
         /// </summary>
-        Low
+        Low,
+        /// <summary>
+        /// Information
+        /// </summary>
+        Information
     }
 }

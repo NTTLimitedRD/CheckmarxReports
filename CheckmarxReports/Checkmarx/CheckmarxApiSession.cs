@@ -264,17 +264,26 @@ namespace CheckmarxReports.Checkmarx
         }
 
         /// <summary>
-        /// 
+        /// Create a client for the given URL.
         /// </summary>
-        /// <param name="sdkUrl"></param>
-        /// <returns></returns>
+        /// <param name="sdkUrl">
+        /// The URL to initialize the client to. This cannot be null.
+        /// </param>
+        /// <returns>
+        /// An initialised <see cref="CxSDKWebServiceSoapClient"/>.
+        /// </returns>
         private CxSDKWebServiceSoapClient GetSoapClient(Uri sdkUrl)
         {
+            if (sdkUrl == null)
+            {
+                throw new ArgumentNullException(nameof(sdkUrl));
+            }
+
             BasicHttpBinding binding;
             EndpointAddress endpointAddress;
 
             binding = new BasicHttpBinding(BasicHttpSecurityMode.Transport);
-            binding.MaxReceivedMessageSize = 1*1024*1024; // 1 MB
+            binding.MaxReceivedMessageSize = 1024*1024*1024; // 1 GB
             endpointAddress = new EndpointAddress(sdkUrl);
 
             return new CxSDKWebServiceSoapClient(binding, endpointAddress);
