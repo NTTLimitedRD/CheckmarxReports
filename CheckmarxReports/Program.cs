@@ -59,7 +59,7 @@ namespace CheckmarxReports
                     .WithNotParsed(
                         errors =>
                         {
-                            Console.Error.WriteLine(errors.First());
+                            // Do nothing
                         });
             }
             catch (Exception ex)
