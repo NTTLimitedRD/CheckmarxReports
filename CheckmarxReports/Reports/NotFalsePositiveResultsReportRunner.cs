@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using CheckmarxReports.Checkmarx;
 using CheckmarxReports.CommandLineOptions;
+using CheckmarxReports.CxSDKWebService;
 
 namespace CheckmarxReports.Reports
 {
@@ -51,19 +52,10 @@ namespace CheckmarxReports.Reports
                 throw new ArgumentNullException(nameof(options));
             }
 
-            //NotFalsePositiveReportOptions notFalsePositiveReportOptions;
-            //Predicate<XElement> projectPredicate;
-
-            //notFalsePositiveReportOptions = options as NotFalsePositiveReportOptions;;
-            //if (notFalsePositiveReportOptions?.ExcludeProjects != null 
-            //    && notFalsePositiveReportOptions.ExcludeProjects.Any())
-            //{
-            //    projectPredicate = xElement => notFalsePositiveReportOptions.ExcludeProjects.Contains(xElement.Name.LocalName);
-            //}
-
             return checkmarxApiSession.GetProjectScans()
                     .AsParallel()
                     .WithDegreeOfParallelism(MaxParallelization)
+                    .Where(GetProjectPredicate(options))
                     .SelectMany(
                         project =>
                             CheckmarxApiSessionHelper.GenerateLastScanXmlReport(checkmarxApiSession, project)
@@ -152,6 +144,44 @@ namespace CheckmarxReports.Reports
             {
                 throw new CheckmarxErrorException($"XML for result in project {projectName} is invalid", ex);
             }
+        }
+
+        /// <summary>
+        /// Determine the project predicate to exclude projects.
+        /// </summary>
+        /// <param name="options">
+        /// The command line options. This cannot be null.
+        /// </param>
+        /// <returns>
+        /// A predicate determining which projects to include in the report.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="options"/> cannot be null.
+        /// </exception>
+        private Func<ProjectScannedDisplayData, bool> GetProjectPredicate(CheckmarxReportOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            NotFalsePositiveReportOptions notFalsePositiveReportOptions;
+            Func<ProjectScannedDisplayData, bool> result;
+
+            notFalsePositiveReportOptions = options as NotFalsePositiveReportOptions;
+            if (notFalsePositiveReportOptions?.ExcludeProjects != null
+                && notFalsePositiveReportOptions.ExcludeProjects.Any())
+            {
+                result =
+                    project => !notFalsePositiveReportOptions.ExcludeProjects.Contains(project.ProjectName);
+            }
+            else
+            {
+                result =
+                    project => true;
+            }
+
+            return result;
         }
     }
 }
