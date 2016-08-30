@@ -13,11 +13,6 @@ namespace CheckmarxReports.Reports
     public class RawScanCsvReportRunner: IReportRunner<string>
     {
         /// <summary>
-        /// Max simultaneous report runs.
-        /// </summary>
-        public const int MaxParallelization = 3;
-
-        /// <summary>
         /// Run the report.
         /// </summary>
         /// <param name="checkmarxApiSession">
@@ -51,7 +46,8 @@ namespace CheckmarxReports.Reports
 
             return checkmarxApiSession.GetProjectScans()
                     .AsParallel()
-                    .WithDegreeOfParallelism(MaxParallelization)
+                    .WithDegreeOfParallelism(ReportRunnerHelper.MaxParallelization)
+                    .Where(ReportRunnerHelper.GetProjectPredicate(options))
                     .Select(
                         project =>
                             CheckmarxApiSessionHelper.GenerateLastScanCsvReport(checkmarxApiSession, project).ToString())

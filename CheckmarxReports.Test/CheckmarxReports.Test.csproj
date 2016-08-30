@@ -66,6 +66,7 @@
     <Compile Include="Credentials\EncryptedCredentialTests.cs" />
     <Compile Include="Credentials\FileCredentialRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\ReportRunnerHelperTests.cs" />
     <Compile Include="Reports\ScanResultTests.cs" />
   </ItemGroup>
   <ItemGroup>

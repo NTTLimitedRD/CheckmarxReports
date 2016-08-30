@@ -78,6 +78,7 @@
     <Compile Include="Credentials\CredentialNotFoundException.cs" />
     <Compile Include="Credentials\FileCredentialRepository.cs" />
     <Compile Include="Credentials\ICredentialRepository.cs" />
+    <Compile Include="Reports\ReportRunnerHelper.cs" />
     <Compile Include="Reports\CsvScanResultFormatter.cs" />
     <Compile Include="CommandLineOptions\NotFalsePositiveReportOptions.cs" />
     <Compile Include="Checkmarx\ICheckmarxApiSession.cs" />
