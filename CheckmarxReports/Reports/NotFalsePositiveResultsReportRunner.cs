@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using CheckmarxReports.Checkmarx;
+using CheckmarxReports.CommandLineOptions;
 
 namespace CheckmarxReports.Reports
 {
@@ -24,6 +25,9 @@ namespace CheckmarxReports.Reports
         /// <param name="checkmarxApiSession">
         /// A <see cref="ICheckmarxApiSession"/> used to run the report. This cannot be null.
         /// </param>
+        /// <param name="options">
+        /// Command line options. This cannot be null.
+        /// </param>
         /// <returns>
         /// The report results.
         /// </returns>
@@ -36,12 +40,26 @@ namespace CheckmarxReports.Reports
         /// <exception cref="CheckmarxCommunicationException">
         /// Communication with the Checkmarx server failed.
         /// </exception>
-        public IList<ScanResult> Run(ICheckmarxApiSession checkmarxApiSession)
+        public IList<ScanResult> Run(ICheckmarxApiSession checkmarxApiSession, CheckmarxReportOptions options)
         {
             if (checkmarxApiSession == null)
             {
                 throw new ArgumentNullException(nameof(checkmarxApiSession));
             }
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            //NotFalsePositiveReportOptions notFalsePositiveReportOptions;
+            //Predicate<XElement> projectPredicate;
+
+            //notFalsePositiveReportOptions = options as NotFalsePositiveReportOptions;;
+            //if (notFalsePositiveReportOptions?.ExcludeProjects != null 
+            //    && notFalsePositiveReportOptions.ExcludeProjects.Any())
+            //{
+            //    projectPredicate = xElement => notFalsePositiveReportOptions.ExcludeProjects.Contains(xElement.Name.LocalName);
+            //}
 
             return checkmarxApiSession.GetProjectScans()
                     .AsParallel()

@@ -40,17 +40,17 @@ namespace CheckmarxReports
                     .WithParsed<NotFalsePositiveReportOptions>(options =>
                         {
                             result = RunReport(new NotFalsePositiveResultsReportRunner(), GetReportResultFormatter(options),
-                                credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
+                                credentialRepository, options);
                         })
                     .WithParsed<RawScanResultXmlOptions>(options =>
                         {
                             result = RunReport(new RawScanXmlReportRunner(), new TextStringFormatter(),
-                                credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
+                                credentialRepository, options);
                         })
                     .WithParsed<RawScanResultCsvOptions>(options =>
                     {
                         result = RunReport(new RawScanCsvReportRunner(), new TextStringFormatter(),
-                            credentialRepository, options.Server, options.UserName, options.Password, options.OutputPath);
+                            credentialRepository, options);
                     })
                     .WithParsed<SaveCredentialsOptions>(options =>
                         {
@@ -82,30 +82,18 @@ namespace CheckmarxReports
         /// <param name="credentialRepository">
         /// Used to load previously saved credentials. Cannot be null.
         /// </param>
-        /// <param name="server">
-        /// The Checkmarx server name. Cannot be null, empty or whitespace.
-        /// </param>
-        /// <param name="suppliedUserName">
-        /// The username to login with. Use the loaded value if null.
-        /// </param>
-        /// <param name="suppliedPassword">
-        /// The password to login with. Use the loaded value if null.
-        /// </param>
-        /// <param name="outputPath">
-        /// An optional file to write the output to.
+        /// <param name="options">
+        /// The command line options. Cannot be null.
         /// </param>
         /// <returns>
         /// The process return value.
         /// </returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="server"/> and <paramref name="suppliedUserName"/> cannot be null, empty or whitespace.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="reportRunner"/>, <paramref name="reportResultFormatter"/> and <paramref name="credentialRepository"/> 
-        /// and  cannot be null.
+        /// <paramref name="reportRunner"/>, <paramref name="reportResultFormatter"/>, <paramref name="credentialRepository"/> 
+        /// and <paramref name="options"/> cannot be null.
         /// </exception>
         private static int RunReport<TReportResult>(IReportRunner<TReportResult> reportRunner, IReportResultFormatter<TReportResult> reportResultFormatter, 
-            ICredentialRepository credentialRepository, string server, string suppliedUserName, string suppliedPassword, string outputPath)
+            ICredentialRepository credentialRepository, CheckmarxReportOptions options)
         {
             if (reportRunner == null)
             {
@@ -119,22 +107,22 @@ namespace CheckmarxReports
             {
                 throw new ArgumentNullException(nameof(credentialRepository));
             }
-            if (string.IsNullOrWhiteSpace(server))
+            if (options == null)
             {
-                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(server));
+                throw new ArgumentNullException(nameof(options));
             }
 
             string userName;
             string password;
 
-            GetCredentials(credentialRepository, server, suppliedUserName, suppliedPassword, out userName, out password);
+            GetCredentials(credentialRepository, options.Server, options.UserName, options.Password, out userName, out password);
 
-            using (Stream stream = string.IsNullOrWhiteSpace(outputPath)
-                ? Console.OpenStandardOutput() : new FileStream(outputPath, FileMode.Create))
+            using (Stream stream = string.IsNullOrWhiteSpace(options.OutputPath)
+                ? Console.OpenStandardOutput() : new FileStream(options.OutputPath, FileMode.Create))
             using (StreamWriter output = new StreamWriter(stream, Encoding.UTF8))
-            using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(server, userName, password))
+            using (CheckmarxApiSession checkmarxApiSession = new CheckmarxApiSession(options.Server, userName, password))
             {
-                reportResultFormatter.Format(reportRunner.Run(checkmarxApiSession), output, server, userName);
+                reportResultFormatter.Format(reportRunner.Run(checkmarxApiSession, options), output, options, userName);
             }
 
             return ExitSuccess;

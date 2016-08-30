@@ -1,4 +1,6 @@
-﻿using CommandLine;
+﻿using System.Collections;
+using CommandLine;
+using System.Collections.Generic;
 
 namespace CheckmarxReports.CommandLineOptions
 {
@@ -30,5 +32,11 @@ namespace CheckmarxReports.CommandLineOptions
         /// </summary>
         [Option('o', "output-file", Required = false, HelpText = "Output file path. If omitted, outputs to stdout.", MetaValue = "OUTPUT_FILE")]
         public string OutputPath { get; set; }
+
+        /// <summary>
+        /// Project to exclude from results.
+        /// </summary>
+        [Option('x', "exclude-project", Required = false, HelpText = "Project to exclude from results", MetaValue="PROJECT_NAME")]
+        public IEnumerable<string> ExcludeProjects { get; set; }
     }
 }

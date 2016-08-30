@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CheckmarxReports.Checkmarx;
+using CheckmarxReports.CommandLineOptions;
 
 namespace CheckmarxReports.Reports
 {
@@ -18,11 +19,14 @@ namespace CheckmarxReports.Reports
         /// <param name="checkmarxApiSession">
         /// A <see cref="ICheckmarxApiSession"/> used to run the report. This cannot be null.
         /// </param>
+        /// <param name="options">
+        /// Command line options. This cannot be null.
+        /// </param>
         /// <returns>
         /// The report results.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="checkmarxApiSession"/> cannot be null.
+        /// <paramref name="checkmarxApiSession"/> and <paramref name="options"/> cannot be null.
         /// </exception>
         /// <exception cref="CheckmarxErrorException">
         /// Checkmarx returned an unexpected result or error.
@@ -30,6 +34,6 @@ namespace CheckmarxReports.Reports
         /// <exception cref="CheckmarxCommunicationException">
         /// Communication with the Checkmarx server failed.
         /// </exception>
-        IList<TReportResult> Run(ICheckmarxApiSession checkmarxApiSession);
+        IList<TReportResult> Run(ICheckmarxApiSession checkmarxApiSession, CheckmarxReportOptions options);
     }
 }

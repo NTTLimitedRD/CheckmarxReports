@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CheckmarxReports.CommandLineOptions;
 
 namespace CheckmarxReports.Reports
 {
@@ -19,8 +20,8 @@ namespace CheckmarxReports.Reports
         /// <param name="output">
         /// The <see cref="TextWriter"/> to write the results to. This cannot be null.
         /// </param>
-        /// <param name="server">
-        /// The Checkmarx server the report was run on. This cannot be null, empty or whitespace.
+        /// <param name="options">
+        /// Command line options. This cannot be null.
         /// </param>
         /// <param name="username">
         /// The user the report was run by. This cannot be null, empty or whitespace.
@@ -29,9 +30,9 @@ namespace CheckmarxReports.Reports
         /// No argument can be null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// <paramref name="server"/> and <paramref name="username"/> cannot be null, empty or whitespace.
+        /// <paramref name="username"/> cannot be null, empty or whitespace.
         /// </exception>
-        public void Format(IList<ScanResult> reportResults, TextWriter output, string server, string username)
+        public void Format(IList<ScanResult> reportResults, TextWriter output, CheckmarxReportOptions options, string username)
         {
             if (reportResults == null)
             {
@@ -41,9 +42,9 @@ namespace CheckmarxReports.Reports
             {
                 throw new ArgumentNullException(nameof(output));
             }
-            if (string.IsNullOrWhiteSpace(server))
+            if (options == null)
             {
-                throw new ArgumentException("Cannot be null, empty or whitespace", nameof(server));
+                throw new ArgumentNullException(nameof(options));
             }
             if (string.IsNullOrWhiteSpace(username))
             {

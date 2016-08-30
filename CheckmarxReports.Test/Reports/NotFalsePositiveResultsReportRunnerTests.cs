@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CheckmarxReports.Checkmarx;
+using CheckmarxReports.CommandLineOptions;
 using CheckmarxReports.CxSDKWebService;
 using CheckmarxReports.Reports;
 using Moq;
@@ -15,8 +16,15 @@ namespace CheckmarxReports.Test.Reports
 		[Test]
 	    public void Run_NullICheckmarxApiSession()
 		{
-            Assert.That(() => new NotFalsePositiveResultsReportRunner().Run(null),
+            Assert.That(() => new NotFalsePositiveResultsReportRunner().Run(null, new Mock<CheckmarxReportOptions>().Object),
 				Throws.ArgumentNullException.And.Property("ParamName").EqualTo("checkmarxApiSession"));
+        }
+
+        [Test]
+        public void Run_NullReportOptions()
+        {
+            Assert.That(() => new NotFalsePositiveResultsReportRunner().Run(new Mock<ICheckmarxApiSession>().Object, null),
+                Throws.ArgumentNullException.And.Property("ParamName").EqualTo("options"));
         }
 
         [Test]
@@ -32,7 +40,9 @@ namespace CheckmarxReports.Test.Reports
 
             notFalsePositiveResultsReportRunner = new NotFalsePositiveResultsReportRunner();
             Assert.That(
-                notFalsePositiveResultsReportRunner.Run(checkmarxApiSessionMock.Object),
+                notFalsePositiveResultsReportRunner.Run(
+                    checkmarxApiSessionMock.Object, 
+                    new Mock<CheckmarxReportOptions>().Object),
                 Is.Empty);
 
             checkmarxApiSessionMock.VerifyAll();
@@ -88,7 +98,9 @@ namespace CheckmarxReports.Test.Reports
                 .Returns(() => reportBytes);
 
             notFalsePositiveResultsReportRunner = new NotFalsePositiveResultsReportRunner();
-            scanResults = notFalsePositiveResultsReportRunner.Run(checkmarxApiSessionMock.Object);
+            scanResults = notFalsePositiveResultsReportRunner.Run(
+                checkmarxApiSessionMock.Object,
+                new Mock<CheckmarxReportOptions>().Object);
             Assert.That(scanResults,
                 Is.EquivalentTo(new []
                 {
@@ -163,7 +175,9 @@ $@"<Project>
                 .Returns(() => reportBytes);
 
             notFalsePositiveResultsReportRunner = new NotFalsePositiveResultsReportRunner();
-            scanResults = notFalsePositiveResultsReportRunner.Run(checkmarxApiSessionMock.Object);
+            scanResults = notFalsePositiveResultsReportRunner.Run(
+                checkmarxApiSessionMock.Object,
+                new Mock<CheckmarxReportOptions>().Object);
             Assert.That(scanResults,
                 Is.EquivalentTo(new[]
                 {
@@ -238,7 +252,9 @@ $@"<Project>
                 .Returns(() => reportBytes);
 
             notFalsePositiveResultsReportRunner = new NotFalsePositiveResultsReportRunner();
-            scanResults = notFalsePositiveResultsReportRunner.Run(checkmarxApiSessionMock.Object);
+            scanResults = notFalsePositiveResultsReportRunner.Run(
+                checkmarxApiSessionMock.Object,
+                new Mock<CheckmarxReportOptions>().Object);
             Assert.That(scanResults,
                 Is.EquivalentTo(new[]
                 {
