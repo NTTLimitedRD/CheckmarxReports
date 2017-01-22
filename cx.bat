@@ -1,11 +1,16 @@
 @echo off
 
-set MYDATE=%date:~10,4%-%date:~7,2%-%date:~4,2%
+set MYDATE=%date:~6,4%-%date:~3,2%-%date:~0,2%
 set OUTPUTDIR=c:\users\anthony\OneDrive - Dimension Data\Checkmarx
 set OUTPUTFILE=%OUTPUTDIR%\Checkmarx %MYDATE%.html
+
+echo %OUTPUTFILE%
+goto exit
 
 mkdir "%OUTPUTDIR%" 2> nul
 
 checkmarxreports not-false-positives -s checkmarx.gmgmt.dimensiondata.com -x "Ceryx Cloud Control" -o "%OUTPUTFILE%"
 
 start "%OUTPUTFILE%" "%OUTPUTFILE%"
+
+:exit
