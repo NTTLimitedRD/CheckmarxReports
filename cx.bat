@@ -1,7 +1,7 @@
 @echo off
 
 set MYDATE=%date:~10,4%-%date:~7,2%-%date:~4,2%
-set OUTPUTDIR=%USERPROFILE%\Checkmarx
+set OUTPUTDIR=c:\users\anthony\OneDrive - Dimension Data\Checkmarx
 set OUTPUTFILE=%OUTPUTDIR%\Checkmarx %MYDATE%.html
 
 mkdir "%OUTPUTDIR%" 2> nul
