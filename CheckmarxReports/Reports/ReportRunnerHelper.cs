@@ -34,11 +34,19 @@ namespace CheckmarxReports.Reports
         /// <exception cref="ArgumentNullException">
         /// <paramref name="options"/> cannot be null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Cannot have both include and exclude projects in <paramref name="options"/>.
+        /// </exception>
         public static Func<ProjectScannedDisplayData, bool> GetProjectPredicate(CheckmarxReportOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
+            }
+            if (options.ExcludeProjects != null && options.ExcludeProjects.Any()
+                && options.Projects != null && options.Projects.Any())
+            {
+                throw new ArgumentException("Cannot have both exclude and include projects");
             }
 
             Func<ProjectScannedDisplayData, bool> result;
@@ -47,6 +55,11 @@ namespace CheckmarxReports.Reports
                 && options.ExcludeProjects.Any())
             {
                 result = project => !options.ExcludeProjects.Contains(project.ProjectName);
+            }
+            else if (options.Projects != null
+                && options.Projects.Any())
+            {
+                result = project => options.Projects.Contains(project.ProjectName);
             }
             else
             {
