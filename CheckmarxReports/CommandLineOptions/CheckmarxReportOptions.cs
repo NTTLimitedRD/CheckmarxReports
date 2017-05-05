@@ -42,7 +42,7 @@ namespace CheckmarxReports.CommandLineOptions
         /// <summary>
         /// Project to include from results. Mutually exclusive with <see cref="ExcludeProjects"/>.
         /// </summary>
-        [Option('p', "project", Required = false, HelpText = "Project to scan", MetaValue = "PROJECT_NAME")]
+        [Option('r', "project", Required = false, HelpText = "Project to scan", MetaValue = "PROJECT_NAME")]
         public IEnumerable<string> Projects { get; set; }
     }
 }
