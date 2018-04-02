@@ -72,9 +72,9 @@ Note:
  1. The code requires C# 6.0 as it uses interpolated strings and the `nameof` keyword. It has only been run in Visual Studio 2015 and Visual Studio 2017 running on Windows 10 and Windows 2012 R2 or later.
  1. There are limited automated tests.
 
-## Contact
+## Contacts
 
-Anthony Langsworth (anthony.langsworth@dimensiondata.com)
-Danny Wong (danny.wong@dimensiondata.com)
-Arkady Kovtun (arkady.kovtun@dimensiondata.com)
+ 1. Anthony Langsworth (anthony.langsworth@dimensiondata.com)
+ 1. Danny Wong (danny.wong@dimensiondata.com)
+ 1. Arkady Kovtun (arkady.kovtun@dimensiondata.com)
 
