@@ -61,7 +61,7 @@ Note:
  1. There is limited control over the report generated. This tool is not meant to provide a broad reporting solution, merely a quick way to get data out of Checkmarx that the UI does not provide. Use the CSV output to get data easily manipulated, such as in a spreadsheet.
  1. The application assumes the Checkmarx server is accessible via HTTPS. After all, we are all security professionals and avoid using HTTP, don't we?
  1. While the architecture supports multiple reports, only one report ("not false positives") is included at this time.
- 1. It has only been tested against Checkmarx v8.0. 
+ 1. It has only been tested against Checkmarx v8.0 and later. 
 
 ## Technical Details
 
@@ -69,9 +69,12 @@ Note:
 
  1. The code uses the [Checkmarx SOAP API](https://checkmarx.atlassian.net/wiki/display/KC/SOAP+API) to access Checkmarx data. It includes a partial .Net wrapper that other projects may find useful.
  1. The code runs reports in parallel, up to 3 at a time. If the reports are large, this may stress the Checkmarx server. This setting is not exposed externally but is easy to do. Raise an issue/request if needed.
- 1. The code requires C# 6.0 as it uses interpolated strings and the `nameof` keyword. It has only been run in Visual Studio 2015 running on Windows 10 and Windows 2012 R2.
+ 1. The code requires C# 6.0 as it uses interpolated strings and the `nameof` keyword. It has only been run in Visual Studio 2015 and Visual Studio 2017 running on Windows 10 and Windows 2012 R2 or later.
  1. There are limited automated tests.
 
 ## Contact
 
 Anthony Langsworth (anthony.langsworth@dimensiondata.com)
+Danny Wong (danny.wong@dimensiondata.com)
+Arkady Kovtun (arkady.kovtun@dimensiondata.com)
+
