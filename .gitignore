@@ -243,3 +243,6 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# Remove DISCO files because they may expose internal file locations
+**/*.disco
