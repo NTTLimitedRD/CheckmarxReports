@@ -74,7 +74,7 @@ Note:
 
 ## Contacts
 
- 1. Anthony Langsworth (anthony.langsworth@dimensiondata.com)
- 1. Danny Wong (danny.wong@dimensiondata.com)
- 1. Arkady Kovtun (arkady.kovtun@dimensiondata.com)
+ 1. Anthony Langsworth (anthony.langsworth@global.ntt)
+ 1. Danny Wong (danny.wong@global.ntt)
+ 1. Arkady Kovtun (arkady.kovtun@global.ntt)
 
